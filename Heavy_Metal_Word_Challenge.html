@@ -1,0 +1,1418 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heavy Metal - Word Challenge</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --pink:#ff35d0;
+  --cyan:#26eaff;
+  --yellow:#ffe34d;
+  --purple:#a34cff;
+  --dark:#09051b;
+  --panel:#160c35;
+  --white:#fff5ff;
+  --green:#52ff9c;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  min-height:100vh;
+  color:var(--white);
+  font-family:'Rajdhani',sans-serif;
+  font-weight:600;
+  letter-spacing:.4px;
+  background:
+    radial-gradient(ellipse at 50% 0%,#35105c 0%,transparent 48%),
+    linear-gradient(180deg,#08051a 0%,#10082c 55%,#05091e 100%);
+  overflow-x:hidden;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  opacity:.15;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    #ffffff 4px
+  );
+}
+
+body::after {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:4;
+  box-shadow:inset 0 0 100px #000000aa;
+}
+
+button,input { font:inherit; }
+
+button {
+  cursor:pointer;
+  transition:transform .12s,filter .12s;
+}
+
+button:hover {
+  transform:translateY(-2px);
+  filter:brightness(1.2);
+}
+
+button:active { transform:translateY(2px); }
+
+button:disabled {
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.wrap {
+  position:relative;
+  z-index:2;
+  width:min(1000px,94%);
+  margin:auto;
+  padding:22px 0 35px;
+}
+
+header {
+  text-align:center;
+  margin-bottom:20px;
+  padding:15px 10px 20px;
+  border-bottom:3px solid var(--purple);
+  box-shadow:0 5px 0 #250d46;
+}
+
+.eyebrow {
+  color:var(--cyan);
+  font-size:13px;
+  letter-spacing:3px;
+  font-weight:700;
+  text-shadow:0 0 8px var(--cyan);
+}
+
+.logo {
+  font-family:'Metal Mania',cursive;
+  font-size:clamp(64px,13vw,112px);
+  line-height:.95;
+  letter-spacing:3px;
+  color:var(--pink);
+  -webkit-text-stroke:1px #ffb8f2;
+  text-shadow:
+    4px 4px 0 #5d147b,
+    7px 7px 0 #210c45,
+    0 0 15px var(--pink),
+    0 0 30px #ff35d088;
+  margin:18px 0 8px;
+}
+
+.logo span {
+  font-family:'Teko',sans-serif;
+  font-weight:700;
+  display:block;
+  color:var(--cyan);
+  font-size:.55em;
+  letter-spacing:9px;
+  margin-top:5px;
+  -webkit-text-stroke:0;
+  text-shadow:
+    3px 3px 0 #174e9c,
+    0 0 12px var(--cyan);
+}
+
+.tag {
+  color:var(--yellow);
+  font-size:14px;
+  letter-spacing:3px;
+  margin-top:18px;
+  font-weight:700;
+  text-shadow:0 0 8px #ffe34d88;
+}
+
+.soundbar {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  margin:20px 0 0;
+  flex-wrap:wrap;
+}
+
+.sound-toggle {
+  color:var(--cyan);
+  background:#100a2c;
+  border:2px solid var(--cyan);
+  border-radius:4px;
+  padding:10px 18px;
+  font-family:'Teko',sans-serif;
+  font-size:19px;
+  font-weight:700;
+  letter-spacing:2px;
+  box-shadow:4px 4px 0 #174b87,0 0 12px #26eaff55;
+}
+
+.sound-note {
+  color:#c8aaff;
+  font-size:12px;
+  letter-spacing:2px;
+}
+
+.panel {
+  background:linear-gradient(145deg,#1c1040,#100a2b 75%);
+  border:3px solid var(--purple);
+  border-radius:5px;
+  padding:22px;
+  margin:18px 0;
+  box-shadow:
+    6px 6px 0 #09051b,
+    0 0 18px #a34cff55,
+    inset 0 0 30px #050316;
+}
+
+.hidden { display:none!important; }
+
+.round-title {
+  color:var(--pink);
+  text-align:center;
+  font-family:'Teko',sans-serif;
+  font-size:clamp(34px,6vw,48px);
+  font-weight:700;
+  letter-spacing:2px;
+  line-height:1.05;
+  text-shadow:3px 3px 0 #58105c,0 0 12px var(--pink);
+  margin:5px 0;
+}
+
+.round-subtitle {
+  text-align:center;
+  color:var(--cyan);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:2px;
+  margin-top:8px;
+}
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:22px 0;
+}
+
+.stat {
+  background:#09071f;
+  border:2px solid #55308d;
+  border-radius:4px;
+  text-align:center;
+  padding:13px 5px;
+  box-shadow:inset 0 0 12px #32165c;
+}
+
+.stat strong {
+  display:block;
+  font-family:'Teko',sans-serif;
+  font-size:40px;
+  line-height:1;
+  font-weight:700;
+  color:var(--yellow);
+  text-shadow:0 0 9px #ffe34d88;
+}
+
+.stat small {
+  display:block;
+  font-family:'Rajdhani',sans-serif;
+  font-size:12px;
+  letter-spacing:1px;
+  font-weight:700;
+  color:var(--cyan);
+  margin-top:6px;
+}
+
+.progress-track {
+  height:15px;
+  border-radius:2px;
+  background:#050414;
+  border:2px solid #6741a0;
+  overflow:hidden;
+  margin:15px 0;
+  padding:2px;
+}
+
+.progress-fill {
+  width:0%;
+  height:100%;
+  background:repeating-linear-gradient(
+    90deg,
+    var(--pink) 0px,
+    var(--pink) 12px,
+    #ff8de7 12px,
+    #ff8de7 15px
+  );
+  box-shadow:0 0 10px var(--pink);
+  transition:width .4s;
+}
+
+.truck-heading {
+  color:var(--cyan);
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:3px;
+  margin:18px 0 8px;
+  text-shadow:0 0 8px var(--cyan);
+}
+
+.truckbox {
+  background:linear-gradient(180deg,#090c2a,#130a32);
+  border:2px solid var(--cyan);
+  border-radius:4px;
+  padding:12px;
+  box-shadow:
+    inset 0 0 20px #153b7a66,
+    0 0 12px #26eaff33;
+}
+
+#truck {
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+.truck-line {
+  fill:none;
+  stroke:var(--yellow);
+  stroke-width:4;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 0 4px #ffe34d);
+}
+
+.truck-detail {
+  fill:none;
+  stroke:var(--yellow);
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 0 4px #ffe34d);
+  opacity:0;
+  transition:opacity .35s;
+}
+
+.truck-detail.visible { opacity:1; }
+
+.truck-status {
+  text-align:center;
+  color:var(--yellow);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:2px;
+  margin:10px 0 2px;
+}
+
+.question-card {
+  text-align:center;
+  background:#09071f;
+  border:2px solid var(--pink);
+  border-radius:4px;
+  padding:23px 14px;
+  margin-top:20px;
+  box-shadow:
+    inset 0 0 18px #47104466,
+    0 0 12px #ff35d033;
+}
+
+.question-number {
+  color:var(--cyan);
+  font-size:14px;
+  letter-spacing:3px;
+  font-weight:700;
+}
+
+.category {
+  display:inline-block;
+  color:var(--yellow);
+  border:1px solid var(--yellow);
+  border-radius:2px;
+  padding:6px 13px;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:2px;
+  margin:14px 0;
+  background:#21143e;
+}
+
+.clue {
+  font-family:'Rajdhani',sans-serif;
+  font-size:clamp(21px,4vw,28px);
+  line-height:1.4;
+  font-weight:700;
+  max-width:700px;
+  margin:10px auto 18px;
+}
+
+.letter-area {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:20px auto;
+}
+
+.letter-box {
+  width:clamp(30px,7vw,45px);
+  height:48px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border:2px solid #6842a4;
+  border-radius:2px;
+  background:#05051a;
+  color:var(--yellow);
+  font-family:'Teko',sans-serif;
+  font-size:27px;
+  font-weight:700;
+  text-align:center;
+  text-transform:uppercase;
+  box-shadow:inset 0 -4px #17103a;
+  outline:none;
+  min-width:0;
+  padding:0;
+}
+
+.letter-box:focus {
+  border-color:var(--cyan);
+  box-shadow:0 0 12px var(--cyan);
+}
+
+.letter-box.given {
+  color:var(--cyan);
+  border-color:#267eaa;
+  background:#10264b;
+}
+
+.letter-box.correct {
+  border-color:var(--green);
+  color:var(--green);
+  box-shadow:0 0 10px #52ff9c77;
+}
+
+.letter-help {
+  color:#b7a5e7;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:1px;
+  margin:12px;
+}
+
+.actions {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:18px 0;
+}
+
+.btn {
+  padding:13px 22px;
+  border:2px solid;
+  border-radius:3px;
+  font-family:'Teko',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  box-shadow:4px 4px 0 #050414;
+}
+
+.primary {
+  color:#16072d;
+  background:var(--yellow);
+  border-color:#fff3a1;
+}
+
+.secondary {
+  color:var(--cyan);
+  background:#0b0a29;
+  border-color:var(--cyan);
+}
+
+.feedback {
+  min-height:27px;
+  font-size:16px;
+  font-weight:700;
+  text-align:center;
+  margin:13px 0;
+  letter-spacing:1px;
+}
+
+.feedback.good {
+  color:var(--green);
+  text-shadow:0 0 8px var(--green);
+}
+
+.feedback.bad {
+  color:#ff648e;
+  text-shadow:0 0 8px #ff648e;
+}
+
+.bonus-label {
+  color:var(--pink);
+  font-weight:700;
+  text-shadow:0 0 12px var(--pink);
+}
+
+.welcome {
+  text-align:center;
+  padding:28px 12px;
+}
+
+.welcome h2,
+.complete h2 {
+  color:var(--yellow);
+  font-family:'Teko',sans-serif;
+  font-size:clamp(38px,7vw,52px);
+  font-weight:700;
+  letter-spacing:2px;
+  line-height:1.05;
+  text-shadow:3px 3px 0 #6b2c86;
+}
+
+.welcome p {
+  color:#e3d9ff;
+  line-height:1.8;
+  font-family:'Rajdhani',sans-serif;
+  font-weight:600;
+  font-size:18px;
+  max-width:650px;
+  margin:15px auto;
+}
+
+.rules {
+  text-align:left;
+  max-width:530px;
+  margin:25px auto;
+  padding:20px;
+  background:#08071e;
+  border:2px solid var(--cyan);
+  border-radius:3px;
+  line-height:2;
+  font-size:15px;
+  font-weight:600;
+  color:#e2d9ff;
+  box-shadow:inset 0 0 15px #123b6c66;
+}
+
+.rules strong { color:var(--cyan); }
+
+.complete {
+  text-align:center;
+  padding:35px 10px;
+}
+
+.complete p {
+  color:#e0d8ff;
+  line-height:1.8;
+  font-family:'Rajdhani',sans-serif;
+  font-weight:600;
+  font-size:18px;
+}
+
+footer {
+  text-align:center;
+  color:var(--pink);
+  font-family:'Rajdhani',sans-serif;
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:2px;
+  margin-top:30px;
+  text-shadow:0 0 8px var(--pink);
+}
+
+.shake { animation:shake .3s; }
+
+@keyframes shake {
+  0%,100% { transform:translateX(0); }
+  25% { transform:translateX(-5px); }
+  75% { transform:translateX(5px); }
+}
+
+@media(max-width:550px) {
+  .panel { padding:13px; }
+  .letter-area { gap:4px; }
+  .letter-box { height:43px; }
+  .stats { gap:5px; }
+  .stat strong { font-size:32px; }
+  .tag { font-size:11px; letter-spacing:2px; }
+  .rules { font-size:13px; padding:14px; }
+  .logo { font-size:clamp(58px,15vw,85px); }
+  .logo span { letter-spacing:5px; }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">INSERT COIN · PLAYER 1 · ARCADE EDITION</div>
+
+  <div class="logo">
+    HEAVY METAL
+    <span>WORD CHALLENGE</span>
+  </div>
+
+  <div class="tag">KNOW YOUR TRUCKS. BUILD YOUR BEAST.</div>
+
+  <div class="soundbar">
+    <button class="sound-toggle" id="soundToggle" aria-pressed="true">
+      ♫ SOUND: ON
+    </button>
+    <span class="sound-note" id="soundNote">ARCADE SFX ENABLED</span>
+  </div>
+</header>
+
+<section class="panel welcome" id="welcome">
+  <h2>READY, PLAYER ONE?</h2>
+
+  <p>
+    Test your heavy-vehicle knowledge.
+    Identify the components, complete the missing letters
+    and watch your truck come to life!
+  </p>
+
+  <div class="rules">
+    <strong>HOW TO PLAY</strong><br>
+    ▸ 50 questions in the main challenge.<br>
+    ▸ Guess the missing letters.<br>
+    ▸ Correct answers build the truck outline.<br>
+    ▸ Wrong answers earn no truck section.<br>
+    ▸ Complete all 50 to unlock the bonus round.<br>
+    ▸ 20 bonus questions reveal the truck details.<br>
+    ▸ Complete everything to finish your beast!
+  </div>
+
+  <button class="btn primary" onclick="startMain()">
+    START GAME ▶
+  </button>
+</section>
+
+<section class="panel hidden" id="mainPanel">
+  <div class="round-title">ROUND 1: BUILD YOUR TRUCK</div>
+  <div class="round-subtitle">50 QUESTIONS · 50 TRUCK SECTIONS</div>
+
+  <div class="stats">
+    <div class="stat">
+      <strong id="mainCount">0/50</strong>
+      <small>COMPLETED</small>
+    </div>
+    <div class="stat">
+      <strong id="mainScore">0</strong>
+      <small>CORRECT ANSWERS</small>
+    </div>
+    <div class="stat">
+      <strong id="mainPercent">0%</strong>
+      <small>PROGRESS</small>
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="mainProgress"></div>
+  </div>
+
+  <div class="truck-heading">YOUR TRUCK IS UNDER CONSTRUCTION</div>
+
+  <div class="truckbox">
+    <svg id="truck" viewBox="0 0 900 330"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <path id="truckOutline" class="truck-line"
+        pathLength="1000"
+        stroke-dasharray="1000"
+        stroke-dashoffset="1000"
+        d="
+        M 35 95 L 590 95 L 590 125 L 655 125
+        Q 690 125 705 150 L 755 195 L 805 205
+        L 825 230 L 825 260 L 790 260
+        A 38 38 0 0 0 714 260 L 340 260
+        A 38 38 0 0 0 264 260 L 225 260
+        L 225 220 L 35 220 Z
+        M 35 95 L 35 220
+        M 590 95 L 590 260
+        M 610 145 L 665 145 Q 682 145 695 163
+        L 735 195 L 610 195 Z
+        M 35 95 L 35 80 L 590 80 L 590 95
+        M 225 220 L 225 260
+        M 340 260 L 714 260
+        "/>
+
+      <circle class="truck-line" cx="302" cy="260" r="39"
+        stroke-dasharray="245" stroke-dashoffset="245" id="wheel1"/>
+      <circle class="truck-line" cx="752" cy="260" r="39"
+        stroke-dasharray="245" stroke-dashoffset="245" id="wheel2"/>
+
+      <circle class="truck-line" cx="302" cy="260" r="17"
+        stroke-dasharray="110" stroke-dashoffset="110" id="hub1"/>
+      <circle class="truck-line" cx="752" cy="260" r="17"
+        stroke-dasharray="110" stroke-dashoffset="110" id="hub2"/>
+
+      <g id="bonusDetails">
+        <path class="truck-detail" d="M620 151 L662 151 L685 185 L620 185 Z"/>
+        <path class="truck-detail" d="M680 120 L694 120 L699 145"/>
+        <path class="truck-detail" d="M705 165 L716 165"/>
+        <path class="truck-detail" d="M760 210 L810 210"/>
+        <path class="truck-detail" d="M755 225 L755 238"/>
+        <path class="truck-detail" d="M590 125 L590 260"/>
+        <path class="truck-detail" d="M600 198 L600 250"/>
+        <path class="truck-detail" d="M615 200 L615 255"/>
+        <path class="truck-detail" d="M630 200 L630 255"/>
+        <path class="truck-detail" d="M645 200 L645 255"/>
+        <path class="truck-detail" d="M660 200 L660 255"/>
+        <path class="truck-detail" d="M675 200 L675 255"/>
+        <path class="truck-detail" d="M225 95 L225 220"/>
+        <path class="truck-detail" d="M245 95 L245 220"/>
+        <path class="truck-detail" d="M225 220 L280 220"/>
+        <path class="truck-detail" d="M35 115 L55 115"/>
+        <path class="truck-detail" d="M35 190 L55 190"/>
+        <path class="truck-detail" d="M800 215 L820 220"/>
+        <path class="truck-detail" d="M70 95 L70 220"/>
+      </g>
+    </svg>
+
+    <div class="truck-status" id="truckStatus">
+      0 OF 50 SECTIONS REVEALED
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="question-number" id="questionNumber">QUESTION 01 / 50</div>
+    <div class="category" id="category">ENGINE SYSTEM</div>
+    <div class="clue" id="clue">Loading question...</div>
+    <div class="letter-area" id="letterArea"></div>
+    <div class="letter-help" id="letterHelp"></div>
+
+    <div class="actions">
+      <button class="btn primary" id="checkButton" onclick="checkAnswer()">
+        CHECK ANSWER
+      </button>
+      <button class="btn secondary" onclick="clearAnswer()">CLEAR</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+</section>
+
+<section class="panel hidden" id="bonusPanel">
+  <div class="round-title bonus-label">★ BONUS ROUND ★</div>
+  <div class="round-subtitle">20 QUESTIONS · COMPLETE YOUR TRUCK</div>
+
+  <div class="stats">
+    <div class="stat">
+      <strong id="bonusCount">0/20</strong>
+      <small>COMPLETED</small>
+    </div>
+    <div class="stat">
+      <strong id="bonusScore">0</strong>
+      <small>CORRECT ANSWERS</small>
+    </div>
+    <div class="stat">
+      <strong id="bonusPercent">0%</strong>
+      <small>PROGRESS</small>
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="bonusProgress"></div>
+  </div>
+
+  <div class="truck-heading">ADD THE FINAL TRUCK DETAILS</div>
+
+  <div class="truckbox">
+    <svg id="bonusTruck" viewBox="0 0 900 330"
+         width="100%" xmlns="http://www.w3.org/2000/svg">
+
+      <path class="truck-line" d="
+        M35 95 L590 95 L590 125 L655 125
+        Q690 125 705 150 L755 195 L805 205
+        L825 230 L825 260 L790 260
+        A38 38 0 0 0 714 260 L340 260
+        A38 38 0 0 0 264 260 L225 260
+        L225 220 L35 220 Z
+        M35 95 L35 220
+        M590 95 L590 260
+        M610 145 L665 145 Q682 145 695 163
+        L735 195 L610 195 Z
+        M35 95 L35 80 L590 80 L590 95
+        M225 220 L225 260
+        M340 260 L714 260
+      "/>
+
+      <circle class="truck-line" cx="302" cy="260" r="39"/>
+      <circle class="truck-line" cx="752" cy="260" r="39"/>
+      <circle class="truck-line" cx="302" cy="260" r="17"/>
+      <circle class="truck-line" cx="752" cy="260" r="17"/>
+
+      <g id="bonusTruckDetails">
+        <path class="truck-detail" d="M620 151 L662 151 L685 185 L620 185 Z"/>
+        <path class="truck-detail" d="M680 120 L694 120 L699 145"/>
+        <path class="truck-detail" d="M705 165 L716 165"/>
+        <path class="truck-detail" d="M760 210 L810 210"/>
+        <path class="truck-detail" d="M755 225 L755 238"/>
+        <path class="truck-detail" d="M590 125 L590 260"/>
+        <path class="truck-detail" d="M600 198 L600 250"/>
+        <path class="truck-detail" d="M615 200 L615 255"/>
+        <path class="truck-detail" d="M630 200 L630 255"/>
+        <path class="truck-detail" d="M645 200 L645 255"/>
+        <path class="truck-detail" d="M660 200 L660 255"/>
+        <path class="truck-detail" d="M675 200 L675 255"/>
+        <path class="truck-detail" d="M225 95 L225 220"/>
+        <path class="truck-detail" d="M245 95 L245 220"/>
+        <path class="truck-detail" d="M225 220 L280 220"/>
+        <path class="truck-detail" d="M35 115 L55 115"/>
+        <path class="truck-detail" d="M35 190 L55 190"/>
+        <path class="truck-detail" d="M800 215 L820 220"/>
+        <path class="truck-detail" d="M70 95 L70 220"/>
+        <path class="truck-detail" d="M790 235 L815 235"/>
+      </g>
+    </svg>
+
+    <div class="truck-status" id="bonusTruckStatus">
+      BONUS DETAILS: 0 OF 20
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="question-number" id="bonusQuestionNumber">
+      BONUS QUESTION 01 / 20
+    </div>
+
+    <div class="category">
+      <span class="bonus-label">BONUS COMPONENTS</span>
+    </div>
+
+    <div class="clue" id="bonusClue"></div>
+    <div class="letter-area" id="bonusLetterArea"></div>
+    <div class="letter-help" id="bonusLetterHelp"></div>
+
+    <div class="actions">
+      <button class="btn primary" onclick="checkBonusAnswer()">CHECK ANSWER</button>
+      <button class="btn secondary" onclick="clearBonusAnswer()">CLEAR</button>
+    </div>
+
+    <div class="feedback" id="bonusFeedback"></div>
+  </div>
+</section>
+
+<section class="panel complete hidden" id="mainComplete">
+  <h2>YOU BUILT YOUR BEAST!</h2>
+
+  <p>
+    Congratulations! All 50 questions answered correctly.
+    Your complete truck outline has been earned.
+  </p>
+
+  <p style="color:#ff35d0;font-weight:bold">
+    ★ BONUS ROUND UNLOCKED ★
+  </p>
+
+  <button class="btn primary" onclick="startBonus()">
+    ENTER BONUS ROUND ▶
+  </button>
+</section>
+
+<section class="panel complete hidden" id="finalComplete">
+  <h2>LEGENDARY PERFORMANCE!</h2>
+
+  <p>
+    You completed all 50 main questions and all 20 bonus questions.
+  </p>
+
+  <p style="color:#ffe34d;font-size:22px;font-weight:bold">
+    YOUR TRUCK IS COMPLETE!
+  </p>
+
+  <div class="truckbox">
+    <svg viewBox="0 0 900 330" width="100%"
+         xmlns="http://www.w3.org/2000/svg">
+      <path class="truck-line" d="
+        M35 95 L590 95 L590 125 L655 125
+        Q690 125 705 150 L755 195 L805 205
+        L825 230 L825 260 L790 260
+        A38 38 0 0 0 714 260 L340 260
+        A38 38 0 0 0 264 260 L225 260
+        L225 220 L35 220 Z
+        M35 95 L35 220
+        M590 95 L590 260
+        M610 145 L665 145 L685 185 L610 185 Z
+        M35 95 L35 80 L590 80 L590 95
+        M225 95 L225 220
+        M245 95 L245 220
+        M225 220 L280 220
+        M35 115 L55 115
+        M35 190 L55 190
+        M800 215 L820 220
+        M70 95 L70 220
+        M680 120 L694 120 L699 145
+        M705 165 L716 165
+        M760 210 L810 210
+        M755 225 L755 238
+        M600 198 L600 255
+        M615 198 L615 255
+        M630 198 L630 255
+        M645 198 L645 255
+        M660 198 L660 255
+        M675 198 L675 255
+      "/>
+      <circle class="truck-line" cx="302" cy="260" r="39"/>
+      <circle class="truck-line" cx="752" cy="260" r="39"/>
+      <circle class="truck-line" cx="302" cy="260" r="17"/>
+      <circle class="truck-line" cx="752" cy="260" r="17"/>
+    </svg>
+  </div>
+
+  <p style="color:#26eaff;font-weight:bold">
+    HEAVY METAL WORD CHALLENGE CHAMPION
+  </p>
+
+  <button class="btn primary" onclick="location.reload()">
+    PLAY AGAIN ↻
+  </button>
+</section>
+
+<footer>© Cindy Swigelaar 🤘</footer>
+</div>
+
+<script>
+/* ELEMENT SELECTOR - DECLARED FIRST TO PREVENT INITIALIZATION ERROR */
+const $ = id => document.getElementById(id);
+
+/* =========================================
+   SOUND ENGINE
+========================================= */
+
+let soundOn = true;
+let audioCtx = null;
+
+function getAudio() {
+  if (!soundOn) return null;
+
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+
+  if (!audioCtx) audioCtx = new AC();
+
+  if (audioCtx.state === "suspended") audioCtx.resume();
+
+  return audioCtx;
+}
+
+function tone(freq, delay, duration, type="square", volume=.045) {
+  const ctx = getAudio();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const start = ctx.currentTime + delay;
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq,start);
+
+  gain.gain.setValueAtTime(.0001,start);
+  gain.gain.exponentialRampToValueAtTime(volume,start+.015);
+  gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(start);
+  osc.stop(start+duration+.03);
+}
+
+function playCorrect() {
+  tone(660,0,.10,"square");
+  tone(880,.10,.13,"square");
+  tone(1100,.20,.10,"square");
+}
+
+function playWrong() {
+  tone(150,0,.18,"sawtooth",.055);
+  tone(100,.13,.20,"square",.045);
+}
+
+function playCelebration() {
+  [[523,0],[659,.13],[784,.26],[1047,.43],[1318,.62]]
+    .forEach(([f,t]) => tone(f,t,.30,"square",.045));
+}
+
+function playBonusFinish() {
+  [[659,0],[784,.14],[988,.28],[1318,.44],[1568,.62]]
+    .forEach(([f,t]) => tone(f,t,.38,"square",.045));
+}
+
+$("soundToggle").addEventListener("click",function() {
+  soundOn = !soundOn;
+
+  this.textContent = soundOn ? "♫ SOUND: ON" : "♫ SOUND: OFF";
+  this.setAttribute("aria-pressed",String(soundOn));
+
+  $("soundNote").textContent =
+    soundOn ? "ARCADE SFX ENABLED" : "SILENT MODE";
+
+  if (soundOn) {
+    getAudio();
+    playCorrect();
+  }
+});
+
+/* =========================================
+   MAIN QUESTION BANK
+========================================= */
+
+const questions = [
+["ENGINE","What component turns the engine over so it can start?","STARTER"],
+["ELECTRICAL","What stores electrical energy for the truck?","BATTERY"],
+["ELECTRICAL","What component charges the battery while the engine runs?","ALTERNATOR"],
+["ENGINE","What forces extra air into the engine to increase power?","TURBOCHARGER"],
+["ENGINE","What moves up and down inside an engine cylinder?","PISTON"],
+["ENGINE","What seals two engine surfaces to prevent leaks?","GASKET"],
+["COOLING","What component removes heat from engine coolant?","RADIATOR"],
+["COOLING","What controls the temperature of engine coolant?","THERMOSTAT"],
+["COOLING","What circulates coolant through the engine?","WATERPUMP"],
+["ENGINE","What removes contaminants from engine oil?","OILFILTER"],
+["FUEL SYSTEM","What stores diesel fuel?","FUELTANK"],
+["FUEL SYSTEM","What sprays fuel into the engine cylinders?","INJECTOR"],
+["BRAKING","What stores compressed air for the braking system?","AIRTANK"],
+["BRAKING","What produces compressed air for the braking system?","AIRCOMPRESSOR"],
+["BRAKING","What friction component presses against a brake disc?","BRAKEPAD"],
+["BRAKING","What rotating component works with brake pads?","BRAKEDISC"],
+["BRAKING","What round component works with brake shoes?","BRAKEDRUM"],
+["BRAKING","What converts air pressure into mechanical brake force?","BRAKECHAMBER"],
+["BRAKING","What controls air pressure in the anti-lock braking system?","ABSVALVE"],
+["TRANSMISSION","What connects and disconnects engine power to the gearbox?","CLUTCH"],
+["TRANSMISSION","What changes the gear ratios of a truck?","GEARBOX"],
+["TRANSMISSION","What shaft transfers power from gearbox to differential?","DRIVESHAFT"],
+["TRANSMISSION","What distributes drive to the wheels and allows different wheel speeds?","DIFFERENTIAL"],
+["DRIVELINE","What connects the wheel assembly to the vehicle structure?","AXLE"],
+["SUSPENSION","What curved steel strips support the vehicle and absorb road shocks?","LEAFSPRING"],
+["SUSPENSION","What component dampens suspension movement?","SHOCKABSORBER"],
+["SUSPENSION","What flexible component cushions movement between suspension parts?","BUSH"],
+["STEERING","What mechanism converts steering input into wheel movement?","STEERINGBOX"],
+["STEERING","What links steering components to the wheel assembly?","TIEROD"],
+["WHEELS","What metal part supports the tyre?","RIM"],
+["WHEELS","What central wheel component supports the wheel and bearings?","HUB"],
+["WHEELS","What rubber component makes contact with the road?","TYRE"],
+["CHASSIS","What is the main structural framework of a truck?","CHASSIS"],
+["CHASSIS","What structural member connects the chassis rails?","CROSSMEMBER"],
+["ENGINE","What component secures an engine or another assembly to the frame?","MOUNT"],
+["BODY","What protects the front of a truck from minor impacts?","BUMPER"],
+["BODY","What is the driver's main enclosed compartment called?","CAB"],
+["BODY","What panel surrounds and protects a wheel opening?","MUDGUARD"],
+["BODY","What provides access to the truck cab?","DOOR"],
+["BODY","What large front glass panel allows the driver to see ahead?","WINDSCREEN"],
+["ELECTRICAL","What protects an electrical circuit from excessive current?","FUSE"],
+["ELECTRICAL","What electrically operated switch controls another circuit?","RELAY"],
+["ELECTRICAL","What illuminates the road in front of the truck?","HEADLIGHT"],
+["ELECTRICAL","What red light warns traffic behind that the truck is braking?","BRAKELIGHT"],
+["EXHAUST","What pipe carries exhaust gases away from the engine?","EXHAUSTPIPE"],
+["EXHAUST","What reduces exhaust noise?","SILENCER"],
+["DRIVELINE","What flexible joint connects shafts at different angles?","UNIVERSALJOINT"],
+["BRAKING","What allows moisture to be released from an air tank?","DRAINVALVE"],
+["ENGINE","What controls or directs the flow of gas or fluid?","VALVE"],
+["ENGINE","What converts piston movement into rotational movement?","CRANKSHAFT"]
+];
+
+/* =========================================
+   BONUS QUESTION BANK
+========================================= */
+
+const bonusQuestions = [
+["BODY","What smaller glass panels are fitted into the sides of the cab?","SIDEWINDOW"],
+["BODY","What helps the driver see traffic behind and beside the truck?","MIRROR"],
+["BODY","What decorative or protective opening covers the front radiator area?","GRILLE"],
+["ELECTRICAL","What flashing light indicates a turn?","INDICATOR"],
+["BODY","What clears rain from the windscreen?","WIPER"],
+["BODY","What holds the windscreen wiper blade?","WIPERARM"],
+["BODY","What is the front hinged engine cover on some trucks called?","BONNET"],
+["BODY","What provides a step for climbing into the cab?","FOOTSTEP"],
+["BODY","What do you pull to open the cab door?","DOORHANDLE"],
+["INTERIOR","What is the driver's seating component called?","DRIVERSEAT"],
+["SAFETY","What reflective component improves vehicle visibility?","REFLECTOR"],
+["BODY","What flexible rubber flap hangs behind a wheel?","MUDFLAP"],
+["BODY","What body panel covers the area around a wheel?","FENDER"],
+["ELECTRICAL","What lamp helps illuminate the road in fog?","FOGLIGHT"],
+["ELECTRICAL","What small lamp improves the visibility of the vehicle's side?","SIDELIGHT"],
+["BODY","What aerodynamic component can be fitted to reduce air resistance?","SPOILER"],
+["BODY","What cover protects the battery assembly?","BATTERYCOVER"],
+["BODY","What aerodynamic roof component helps direct airflow?","AIRSPOILER"],
+["BODY","What large exterior panel covers the side of a vehicle?","SIDEPANEL"],
+["BODY","What handle helps a person climb into or out of the cab?","GRABHANDLE"]
+];
+
+/* =========================================
+   GAME VARIABLES
+========================================= */
+
+let mainIndex = 0;
+let bonusIndex = 0;
+let mainSolved = 0;
+let bonusSolved = 0;
+let busy = false;
+
+/* =========================================
+   START GAME
+========================================= */
+
+function startMain() {
+  getAudio();
+  $("welcome").classList.add("hidden");
+  $("mainPanel").classList.remove("hidden");
+  renderMain();
+}
+
+function renderMain() {
+  if (mainIndex >= questions.length) return;
+
+  const q = questions[mainIndex];
+
+  $("questionNumber").textContent =
+    `QUESTION ${String(mainIndex+1).padStart(2,"0")} / 50`;
+
+  $("category").textContent = q[0];
+  $("clue").textContent = q[1];
+
+  $("feedback").textContent = "";
+  $("feedback").className = "feedback";
+
+  $("mainCount").textContent = `${mainSolved}/50`;
+  $("mainScore").textContent = mainSolved;
+  $("mainPercent").textContent = `${mainSolved*2}%`;
+  $("mainProgress").style.width = `${mainSolved*2}%`;
+
+  $("truckStatus").textContent =
+    `${mainSolved} OF 50 SECTIONS REVEALED`;
+
+  buildLetters(q[2],"letterArea","letterHelp");
+}
+
+/* =========================================
+   LETTER BOXES
+========================================= */
+
+function buildLetters(answer,areaId,helpId) {
+  const area = $(areaId);
+  area.innerHTML = "";
+
+  const positions = new Set([
+    0,
+    Math.floor(answer.length/2)
+  ]);
+
+  for (let i=0;i<answer.length;i++) {
+    const input = document.createElement("input");
+
+    input.className = "letter-box";
+    input.type = "text";
+    input.maxLength = 1;
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.dataset.position = i;
+    input.setAttribute("aria-label",`Letter ${i+1}`);
+
+    if (positions.has(i)) {
+      input.value = answer[i];
+      input.readOnly = true;
+      input.classList.add("given");
+    } else {
+      input.addEventListener("input",function() {
+        this.value = this.value
+          .replace(/[^a-z]/gi,"")
+          .toUpperCase()
+          .slice(0,1);
+
+        getAudio();
+
+        const boxes = [...area.querySelectorAll("input")];
+        const next = boxes.find(b => !b.readOnly && !b.value);
+
+        if (next) next.focus();
+      });
+
+      input.addEventListener("keydown",function(e) {
+        const boxes = [...area.querySelectorAll("input")];
+        const index = boxes.indexOf(this);
+
+        if (e.key === "Backspace" && !this.value) {
+          const previous = boxes
+            .slice(0,index)
+            .reverse()
+            .find(b => !b.readOnly);
+
+          if (previous) previous.focus();
+        }
+
+        if (e.key === "Enter") {
+          if (areaId === "letterArea") checkAnswer();
+          else checkBonusAnswer();
+        }
+      });
+    }
+
+    area.appendChild(input);
+  }
+
+  $(helpId).textContent =
+    `${answer.length} LETTERS · ${positions.size} LETTERS REVEALED`;
+}
+
+function getEnteredAnswer(areaId) {
+  return [...$(areaId).querySelectorAll("input")]
+    .map(input => input.value.toUpperCase())
+    .join("");
+}
+
+function clearAnswer() {
+  $("letterArea").querySelectorAll("input").forEach(input => {
+    if (!input.readOnly) input.value = "";
+  });
+
+  const first = $("letterArea").querySelector("input:not([readonly])");
+  if (first) first.focus();
+}
+
+function clearBonusAnswer() {
+  $("bonusLetterArea").querySelectorAll("input").forEach(input => {
+    if (!input.readOnly) input.value = "";
+  });
+
+  const first = $("bonusLetterArea").querySelector("input:not([readonly])");
+  if (first) first.focus();
+}
+
+/* =========================================
+   MAIN TRUCK PROGRESS
+========================================= */
+
+function drawTruck() {
+  const progress = mainSolved / 50;
+
+  $("truckOutline").style.strokeDashoffset =
+    1000 * (1-progress);
+
+  ["wheel1","wheel2"].forEach(id => {
+    $(id).style.strokeDashoffset = 245*(1-progress);
+  });
+
+  ["hub1","hub2"].forEach(id => {
+    $(id).style.strokeDashoffset = 110*(1-progress);
+  });
+}
+
+/* =========================================
+   MAIN ANSWER CHECK
+========================================= */
+
+function checkAnswer() {
+  if (busy || mainIndex >= questions.length) return;
+
+  const answer = questions[mainIndex][2];
+  const attempt = getEnteredAnswer("letterArea");
+
+  if (attempt.length !== answer.length) {
+    $("feedback").textContent = "PLEASE COMPLETE ALL LETTERS!";
+    $("feedback").className = "feedback bad";
+    playWrong();
+    return;
+  }
+
+  if (attempt === answer) {
+    busy = true;
+    mainSolved++;
+
+    playCorrect();
+
+    $("feedback").textContent =
+      "✓ CORRECT! YOUR TRUCK IS TAKING SHAPE!";
+
+    $("feedback").className = "feedback good";
+
+    $("letterArea").querySelectorAll("input").forEach(input => {
+      input.disabled = true;
+      input.classList.add("correct");
+    });
+
+    drawTruck();
+
+    $("mainCount").textContent = `${mainSolved}/50`;
+    $("mainScore").textContent = mainSolved;
+    $("mainPercent").textContent = `${mainSolved*2}%`;
+    $("mainProgress").style.width = `${mainSolved*2}%`;
+
+    $("truckStatus").textContent =
+      `${mainSolved} OF 50 SECTIONS REVEALED`;
+
+    setTimeout(() => {
+      busy = false;
+      mainIndex++;
+
+      if (mainSolved === 50) finishMain();
+      else renderMain();
+    },850);
+
+  } else {
+    playWrong();
+
+    $("feedback").textContent = "✕ NOT QUITE! TRY AGAIN.";
+    $("feedback").className = "feedback bad";
+
+    $("letterArea").classList.remove("shake");
+    void $("letterArea").offsetWidth;
+    $("letterArea").classList.add("shake");
+  }
+}
+
+/* =========================================
+   MAIN ROUND COMPLETION
+========================================= */
+
+function finishMain() {
+  playCelebration();
+
+  $("mainPanel").classList.add("hidden");
+  $("mainComplete").classList.remove("hidden");
+}
+
+/* =========================================
+   BONUS ROUND
+========================================= */
+
+function startBonus() {
+  $("mainComplete").classList.add("hidden");
+  $("bonusPanel").classList.remove("hidden");
+  renderBonus();
+}
+
+function renderBonus() {
+  if (bonusIndex >= bonusQuestions.length) return;
+
+  const q = bonusQuestions[bonusIndex];
+
+  $("bonusQuestionNumber").textContent =
+    `BONUS QUESTION ${String(bonusIndex+1).padStart(2,"0")} / 20`;
+
+  $("bonusClue").textContent = q[1];
+
+  $("bonusFeedback").textContent = "";
+  $("bonusFeedback").className = "feedback";
+
+  $("bonusCount").textContent = `${bonusSolved}/20`;
+  $("bonusScore").textContent = bonusSolved;
+  $("bonusPercent").textContent = `${bonusSolved*5}%`;
+  $("bonusProgress").style.width = `${bonusSolved*5}%`;
+
+  $("bonusTruckStatus").textContent =
+    `BONUS DETAILS: ${bonusSolved} OF 20`;
+
+  buildLetters(q[2],"bonusLetterArea","bonusLetterHelp");
+}
+
+function checkBonusAnswer() {
+  if (busy || bonusIndex >= bonusQuestions.length) return;
+
+  const answer = bonusQuestions[bonusIndex][2];
+  const attempt = getEnteredAnswer("bonusLetterArea");
+
+  if (attempt.length !== answer.length) {
+    $("bonusFeedback").textContent = "PLEASE COMPLETE ALL LETTERS!";
+    $("bonusFeedback").className = "feedback bad";
+    playWrong();
+    return;
+  }
+
+  if (attempt === answer) {
+    busy = true;
+    bonusSolved++;
+
+    playCorrect();
+
+    $("bonusFeedback").textContent =
+      "★ CORRECT! ANOTHER DETAIL ADDED!";
+
+    $("bonusFeedback").className = "feedback good";
+
+    $("bonusLetterArea").querySelectorAll("input").forEach(input => {
+      input.disabled = true;
+      input.classList.add("correct");
+    });
+
+    revealBonusDetail(bonusSolved-1);
+
+    $("bonusCount").textContent = `${bonusSolved}/20`;
+    $("bonusScore").textContent = bonusSolved;
+    $("bonusPercent").textContent = `${bonusSolved*5}%`;
+    $("bonusProgress").style.width = `${bonusSolved*5}%`;
+
+    $("bonusTruckStatus").textContent =
+      `BONUS DETAILS: ${bonusSolved} OF 20`;
+
+    setTimeout(() => {
+      busy = false;
+      bonusIndex++;
+
+      if (bonusSolved === 20) finishBonus();
+      else renderBonus();
+    },850);
+
+  } else {
+    playWrong();
+
+    $("bonusFeedback").textContent =
+      "✕ NOT QUITE! GIVE IT ANOTHER GO.";
+
+    $("bonusFeedback").className = "feedback bad";
+
+    $("bonusLetterArea").classList.remove("shake");
+    void $("bonusLetterArea").offsetWidth;
+    $("bonusLetterArea").classList.add("shake");
+  }
+}
+
+function revealBonusDetail(index) {
+  const details = $("bonusTruckDetails").querySelectorAll(".truck-detail");
+
+  if (details[index]) {
+    details[index].classList.add("visible");
+  }
+
+  const mainDetails = $("bonusDetails").querySelectorAll(".truck-detail");
+
+  if (mainDetails[index]) {
+    mainDetails[index].classList.add("visible");
+  }
+}
+
+/* =========================================
+   FINAL VICTORY
+========================================= */
+
+function finishBonus() {
+  playBonusFinish();
+
+  $("bonusPanel").classList.add("hidden");
+  $("finalComplete").classList.remove("hidden");
+}
+</script>
+</body>
+</html>

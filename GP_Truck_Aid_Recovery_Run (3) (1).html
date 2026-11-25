@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#14171c">
+<title>GP Truck Aid – Recovery Run</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;background:#0c0e11;color:#eee;font-family:"Courier New",ui-monospace,monospace;overflow:hidden;overscroll-behavior:none;touch-action:none}
+:root{--y:#ffc21a;--o:#ff7a1a;--r:#e0352b;--g:#14171c;--g2:#1d2128;--g3:#2a303a}
+#app{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"stage stage" "cl cr" "cp cp";background:radial-gradient(circle at 50% 30%,#1a1e25,#08090b)}
+#stage{grid-area:stage;position:relative;display:flex;align-items:center;justify-content:center;min-height:0;min-width:0;overflow:hidden}
+#wrap{position:relative;box-shadow:0 0 0 3px #2a303a,0 0 0 5px #000,0 10px 40px #000}
+#cv{display:block;width:100%;height:100%;image-rendering:pixelated;background:#222}
+#scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+.ib{position:absolute;top:3px;width:34px;height:34px;border:2px solid var(--y);background:#14171ccc;color:var(--y);font:bold 15px "Courier New",monospace;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+#pauseBtn{right:3px}#muteBtn{right:41px}
+.ctl{display:flex;gap:8px;min-width:0;padding:10px 8px calc(12px + env(safe-area-inset-bottom));align-items:center;justify-content:center;background:#0f1216;border-top:2px solid #2a303a}
+#copy{grid-area:cp;text-align:center;font:11px "Courier New",monospace;color:#8a93a0;background:#0f1216;padding:2px 6px calc(5px + env(safe-area-inset-bottom));letter-spacing:1px}
+#copy.m{grid-area:auto;margin-top:8px;background:none;padding:0}
+#ctlL{grid-area:cl}#ctlR{grid-area:cr}
+.cb{touch-action:none;width:min(17.5vw,84px);height:min(17.5vw,84px);border-radius:16px;border:3px solid #596273;background:linear-gradient(#30363f,#1d2128);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font:bold 11px "Courier New",monospace;box-shadow:0 5px 0 #0a0c0f;padding:0}
+.cb svg{width:34px;height:34px;fill:currentColor}
+.cb.down{transform:translateY(4px);box-shadow:0 1px 0 #0a0c0f;background:linear-gradient(#ffb21a,#e07a00);border-color:#ffe08a;color:#1a1200}
+#bBrake{background:linear-gradient(#8f2a22,#5d1712);border-color:#ff7b6e}#bBrake.down{background:linear-gradient(#ff5a4a,#c42a1c);color:#fff}
+#bUp{color:#7dff9a}#bDown{color:#ffcf6b}
+#ctlR{flex-wrap:nowrap}
+@media (hover:hover) and (pointer:fine) and (min-width:760px){.ctl{display:none}}
+@media (orientation:landscape) and (max-height:520px){
+ #app{grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:1fr;grid-template-areas:"cl stage cr"}
+ #copy{position:absolute;left:50%;bottom:0;transform:translateX(-50%);background:none;font-size:9px;padding:0 4px 1px;z-index:5}
+ .ctl{border:0;background:transparent;flex-direction:column;padding:8px 10px;justify-content:center}
+ #ctlL{flex-direction:column}
+ .ib{width:22px;height:22px;font-size:10px;top:2px;border-width:1px}#pauseBtn{right:2px}#muteBtn{right:26px}
+ .cb{width:min(20vh,72px);height:min(20vh,72px)}
+ #ctlL .cb svg,#ctlR .cb svg{width:28px;height:28px}
+}
+/* screens */
+.screen{position:absolute;inset:0;display:none;overflow:auto;background:rgba(8,10,13,.9);z-index:20;padding:10px;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.screen.show{display:flex}
+.card{margin:auto;width:min(94vw,520px);background:linear-gradient(#20252d,#171a20);border:3px solid var(--y);border-radius:12px;padding:14px 16px;box-shadow:0 0 0 3px #000,0 12px 40px #000;text-align:center}
+.card.bad{border-color:var(--r)}.card.warn{border-color:var(--o)}.card.good{border-color:#4cd964}
+h1{margin:0;font-size:clamp(26px,8vw,44px);line-height:.95;color:var(--y);letter-spacing:2px;text-shadow:3px 3px 0 #000,0 0 18px #ff7a1a66}
+h1 span{display:block;color:#fff;font-size:.62em;letter-spacing:5px;text-shadow:2px 2px 0 var(--o)}
+h2{margin:0 0 6px;font-size:clamp(17px,5vw,24px);color:var(--r);letter-spacing:1px}
+.card.warn h2{color:var(--o)}.card.good h2{color:#4cd964}
+.tag{color:var(--y);font-size:12px;letter-spacing:2px;margin:6px 0 8px}
+p{margin:6px 0;font-size:13px;line-height:1.35;color:#d7dbe2}
+.btn{display:block;width:100%;margin:12px 0 4px;padding:15px 10px;border:0;border-radius:10px;font:bold 20px "Courier New",monospace;letter-spacing:2px;color:#1a1200;background:linear-gradient(#ffd23a,#ff9a10);box-shadow:0 5px 0 #8a4a00,0 0 0 3px #000;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #8a4a00,0 0 0 3px #000}
+.btn.red{background:linear-gradient(#ff5a4a,#c42a1c);color:#fff;box-shadow:0 5px 0 #6a120a,0 0 0 3px #000}
+.btn.grn{background:linear-gradient(#6dff8a,#28b44a);box-shadow:0 5px 0 #14602a,0 0 0 3px #000}
+.sec{text-align:left;background:#0e1115;border-left:4px solid var(--o);padding:6px 9px;margin:6px 0;border-radius:3px}
+.sec b{display:block;color:var(--y);font-size:11px;letter-spacing:1px}
+.sec span{font-size:12.5px;color:#e6e9ee;line-height:1.35;display:block}
+.rem{border:2px dashed #ffc21a88;background:#ffc21a14;border-radius:8px;padding:7px 9px;margin:8px 0 2px;font-size:11.5px;color:#ffe9a6;line-height:1.35;text-align:left}
+.keys{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:11.5px;text-align:left;margin:6px 0}
+.keys b{color:var(--y)}
+#ill{width:100%;max-width:340px;height:auto;image-rendering:pixelated;border:2px solid #000;border-radius:6px;margin:6px 0 0;background:#333}
+select{width:100%;padding:9px;font:bold 14px "Courier New",monospace;background:#0e1115;color:#fff;border:2px solid var(--o);border-radius:6px}
+.stats{display:flex;gap:8px;justify-content:center;margin:8px 0;flex-wrap:wrap}
+.stats div{background:#0e1115;border:2px solid #333b47;border-radius:6px;padding:5px 10px;font-size:11px;color:#aab}
+.stats b{display:block;font-size:17px;color:var(--y)}
+@media (max-height:640px){.card{padding:10px 12px}p{font-size:12px}.btn{padding:11px;font-size:17px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <div id="wrap">
+      <canvas id="cv" width="360" height="640"></canvas>
+      <div id="scan"></div>
+      <button class="ib" id="muteBtn" aria-label="Sound">♪</button>
+      <button class="ib" id="pauseBtn" aria-label="Pause">II</button>
+    </div>
+  </div>
+  <div class="ctl" id="ctlL">
+    <button class="cb" id="bLeft" data-k="left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 3 5 12l10 9v-5l5 0V8l-5 0z"/></svg>LEFT</button>
+    <button class="cb" id="bRight" data-k="right" aria-label="Steer right"><svg viewBox="0 0 24 24"><path d="M9 3l10 9-10 9v-5H4V8h5z"/></svg>RIGHT</button>
+  </div>
+  <div class="ctl" id="ctlR">
+    <button class="cb" id="bUp" data-k="up" aria-label="Forward"><svg viewBox="0 0 24 24"><path d="M3 15 12 5l9 10h-5v5H8v-5z"/></svg>FWD</button>
+    <button class="cb" id="bDown" data-k="down" aria-label="Reverse"><svg viewBox="0 0 24 24"><path d="M3 9l9 10 9-10h-5V4H8v5z"/></svg>REV</button>
+    <button class="cb" id="bBrake" data-k="brake" aria-label="Brake"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>BRAKE</button>
+  </div>
+
+  <!-- MENU -->
+  <div id="copy">©️ Cindy Swigelaar 🤘</div>
+  <div class="screen show" id="sMenu"><div class="card">
+    <h1>GP TRUCK AID<span>RECOVERY RUN</span></h1>
+    <div class="tag">A SAFE RECOVERY IS A SUCCESSFUL RECOVERY</div>
+    <canvas id="ill" width="320" height="96"></canvas>
+    <button class="btn" id="btnStart">START ENGINE</button>
+    <p>You are driving a <b style="color:#ff7a1a">recovery truck</b> towing a <b style="color:#8fb4d9">disabled heavy truck</b> from the public road, through the company entrance and workshop yard, and into the loading bay.</p>
+    <div class="sec"><b>OBJECTIVE</b><span>Deliver the disabled truck safely. Avoid cones, barriers, parked trucks, forklifts and workers. Oil spills cost you traction. At the bay, reverse the towed truck in straight.</span></div>
+    <div class="keys"><div><b>▲ / W</b> forward</div><div><b>▼ / S</b> reverse</div><div><b>◀ ▶ / A D</b> steer</div><div><b>SPACE</b> brake</div><div><b>P</b> pause</div><div><b>Touch</b> hold buttons</div></div>
+    <div class="rem">Prevent collisions and other safety incidents. Stay alert, watch for hazards, and keep a safe distance from people, vehicles and equipment.</div>
+    <div id="copy2" style="margin-top:8px;font-size:11px;color:#8a93a0">©️ Cindy Swigelaar 🤘</div>
+  </div></div>
+
+  <!-- NEAR MISS -->
+  <div class="screen" id="sNear"><div class="card warn">
+    <h2>⚠ NEAR-MISS SAFETY EVENT</h2>
+    <p style="color:#ff7a1a;font-weight:bold">OIL SPILL – LOSS OF TRACTION</p>
+    <div class="sec"><b>INCIDENT TYPE:</b><span>Oil spill – temporary loss of traction.</span></div>
+    <div class="sec"><b>WHAT HAPPENED:</b><span>The recovery vehicle drove over an oil spill and temporarily lost tyre grip.</span></div>
+    <div class="sec"><b>POTENTIAL CONSEQUENCES:</b><span>The vehicle could have slid into another vehicle, a worker, roadside equipment or another hazard.</span></div>
+    <div class="sec"><b>IMMEDIATE ACTION:</b><span>Stop safely, warn others and keep people clear of the affected area.</span></div>
+    <div class="sec"><b>FOLLOW-UP ACTION:</b><span>Notify the supervisor or designated safety contact. Isolate the spill and arrange clean-up by trained or authorised personnel.</span></div>
+    <div class="sec"><b>LOCATION:</b><select id="nmLoc"><option value="Public approach road">Public approach road</option><option value="Workshop yard">Workshop yard</option></select></div>
+    <button class="btn" id="btnReport">SUBMIT NEAR-MISS REPORT</button>
+  </div></div>
+
+  <!-- INCIDENT -->
+  <div class="screen" id="sOver"><div class="card bad">
+    <h2 id="ovH">COLLISION INCIDENT – GAME OVER</h2>
+    <p id="ovM"></p>
+    <div class="stats"><div>DISTANCE<b id="ovD">0 m</b></div><div>NEAR-MISSES REPORTED<b id="ovN">0</b></div></div>
+    <div class="rem">Prevent collisions and other safety incidents. Stay alert, watch for hazards, and keep a safe distance from people, vehicles and equipment.</div>
+    <button class="btn red" id="btnRestart">RESTART GAME</button>
+  </div></div>
+
+  <!-- DELIVERED -->
+  <div class="screen" id="sDone"><div class="card good">
+    <h2>RECOVERY COMPLETE!</h2>
+    <p>You safely delivered the recovered heavy vehicle to the workshop.</p>
+    <p style="color:#ffc21a;font-weight:bold">A SAFE RECOVERY IS A SUCCESSFUL RECOVERY!</p>
+    <div class="stats"><div>TIME<b id="dnT">0:00</b></div><div>NEAR-MISSES REPORTED<b id="dnN">0</b></div><div>BEST TIME<b id="dnB">-</b></div></div>
+    <div class="rem">Prevent collisions and other safety incidents. Stay alert, watch for hazards, and keep a safe distance from people, vehicles and equipment.</div>
+    <button class="btn grn" id="btnAgain">PLAY AGAIN</button>
+  </div></div>
+
+  <!-- PAUSE -->
+  <div class="screen" id="sPause"><div class="card">
+    <h2 style="color:#ffc21a">PAUSED</h2>
+    <p>You are operating a recovery truck towing a disabled heavy truck.</p>
+    <div class="rem">Prevent collisions and other safety incidents. Stay alert, watch for hazards, and keep a safe distance from people, vehicles and equipment.</div>
+    <button class="btn" id="btnResume">RESUME</button>
+    <button class="btn red" id="btnQuit" style="font-size:15px;padding:10px">RESTART</button>
+  </div></div>
+</div>
+
+<script>
+'use strict';
+/* =========================================================
+   GP TRUCK AID – RECOVERY RUN
+   World coords: x 0..360 (left→right), y runs NEGATIVE going forward.
+   Camera: screen = world − (0, camY). Truck sits low on screen.
+   ========================================================= */
+const W = 360, H = 640, TRUCK_SCREEN_Y = 470;
+const ST = { MENU: 'MENU', PLAY: 'PLAYING', NEAR: 'NEAR_MISS_REPORT', OVER: 'COLLISION_GAME_OVER', DONE: 'DELIVERED' };
+const MAXV = 140, MAXR = 42, WB = 40, HITCH = 44, LT = 82, TOWC = 53, JK_WARN = 0.95, JK_MAX = 1.25;
+const TRK = { hl: 30, hw: 14 }, TOW = { hl: 52, hw: 15 };
+const Y_GATE = -3050, Y_BAY_END = -6560;
+const BAY = { x0: 70, x1: 176, yTop: -6230, yBack: -5864 };
+const REMINDER = 'Prevent collisions and other safety incidents. Stay alert, watch for hazards, and keep a safe distance from people, vehicles and equipment.';
+const MSG = {
+  worker: ['WORKER COLLISION – GAME OVER', 'A worker has been struck. Stop immediately. Check for injuries and arrange first aid or emergency medical assistance. Do not move an injured person unless there is immediate danger. Secure the area, keep others clear and notify the supervisor immediately. Follow workplace incident reporting and investigation procedures.'],
+  fork: ['FORKLIFT COLLISION – GAME OVER', 'The recovery vehicle has collided with a forklift. Stop and secure the area. Check for injuries, keep people clear and isolate affected equipment where safe. Notify the supervisor and report the incident for investigation.'],
+  heavy: ['HEAVY VEHICLE COLLISION – GAME OVER', 'The recovery vehicle or towed vehicle has collided with a parked heavy vehicle. Stop and secure the scene, check for injuries, keep others clear and notify the supervisor. Record the damage and investigate the cause.'],
+  prop: ['COLLISION INCIDENT – GAME OVER', 'The recovery vehicle or towed vehicle has struck a roadside object or barrier. Stop, secure the area, check for injuries, keep others clear and notify the supervisor. Record damage and complete the required incident investigation.'],
+  road: ['ROAD DEPARTURE – GAME OVER', 'The recovery vehicle or towed heavy truck has crossed the safe road boundary. Stop and secure the area. Check for injuries or damage, keep others clear and notify the supervisor. Record and investigate the event.']
+};
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sgn = v => v > 0 ? 1 : v < 0 ? -1 : 0;
+const norm = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+/* ------------------------- world (built once, fully pre-placed) ------------------------- */
+function buildWorld() {
+  const solids = [], oil = [], peds = [], forks = [];
+  const add = (k, x, y, w, h, extra) => solids.push(Object.assign({ k, x, y, w, h }, extra || {}));
+  const cones = (x0, y, n, dx) => { for (let i = 0; i < n; i++) add('cone', x0 + i * dx - 5, y - 5, 10, 10); };
+  const barrier = (x, y, w) => add('barrier', x, y - 8, w, 16);
+  const spill = (x, y, r) => oil.push({ x, y, r, done: false, seed: Math.random() * 9 });
+  // STAGE 1 – public approach road (asphalt x 65..295)
+  cones(90, -520, 4, 14); spill(225, -780, 26); barrier(100, -1020, 90);
+  spill(160, -1260, 26); cones(240, -1260, 3, 14); barrier(205, -1520, 90);
+  cones(250, -1760, 3, 14); spill(110, -1760, 26); barrier(70, -2000, 80); spill(235, -2000, 26);
+  cones(90, -2250, 3, 14); cones(235, -2250, 3, 14); spill(180, -2500, 28); barrier(160, -2700, 80);
+  cones(80, -2930, 1, 0); cones(280, -2930, 1, 0);
+  // STAGE 2 – company entrance gate
+  add('post', 59, Y_GATE - 8, 16, 16); add('post', 285, Y_GATE - 8, 16, 16);
+  add('fence', 12, Y_GATE - 3, 47, 6); add('fence', 301, Y_GATE - 3, 47, 6);
+  // STAGE 3 – workshop yard (lane x 64..296)
+  const pk = (side, y, i) => add('truck', side === 'L' ? 18 : 308, y, 34, 102, { cab: ['#c0392b', '#2e7d9a', '#d4a017', '#6a4c93', '#3a8f5c', '#b5651d'][i % 6], flip: i % 2 === 0 });
+  [-3300, -4100, -4500, -4950, -5350].forEach((y, i) => pk('L', y, i));
+  [-3450, -3850, -4300, -4700, -5150, -5480].forEach((y, i) => pk('R', y, i + 2));
+  add('equip', 262, -3400, 24, 24, { t: 'tyres' }); add('equip', 66, -3760, 22, 22, { t: 'drums' }); add('equip', 270, -4620, 24, 24, { t: 'comp' });
+  add('equip', 68, -4960 + 120, 22, 22, { t: 'drums' }); add('equip', 266, -5050, 22, 22, { t: 'trolley' }); add('equip', 68, -5420, 24, 24, { t: 'tyres' });
+  cones(200, -3550, 3, 14); barrier(100, -4000, 100); cones(120, -4400, 3, 14); barrier(190, -4650, 100); cones(100, -5600, 4, 14);
+  [[-3600, 90, 270, 32], [-4050, 100, 260, 34], [-4550, 90, 270, 36], [-5000, 100, 250, 32]].forEach(w => peds.push({ x: w[1], y: w[0], a: w[1], b: w[2], sp: w[3], dir: 1, ph: Math.random() * 6 }));
+  peds.push({ x: 82, y: -3900, a: 82, b: 82, sp: 0, dir: 1, ph: 1 }); peds.push({ x: 290, y: -4200, a: 290, b: 290, sp: 0, dir: -1, ph: 2 });
+  [-3900, -4300, -4800, -5250].forEach((y, i) => forks.push({ x: 85 + i * 30, y, a: 85, b: 275, sp: 50 + i * 4, dir: i % 2 ? -1 : 1 }));
+  spill(200, -3700, 26); spill(120, -4200, 26); spill(220, -4750, 26); spill(140, -5300, 26);
+  // STAGE 4 – loading bay
+  add('bay', 12, BAY.yTop, 58, BAY.yBack - BAY.yTop + 14);
+  add('bay', BAY.x0, BAY.yBack, BAY.x1 - BAY.x0, 14);
+  add('bay', BAY.x1, BAY.yTop, 14, BAY.yBack - BAY.yTop + 14);
+  add('fence', 12, Y_BAY_END, 336, 14);
+  solids.forEach(s => { s.cx = s.x + s.w / 2; s.cy = s.y + s.h / 2; });
+  return { solids, oil, peds, forks };
+}
+
+/* ------------------------- state ------------------------- */
+const G = { state: ST.MENU, paused: false, anim: 0, T: null, world: null, cam: 0, banner: '', bannerT: 0, stage: 0, reports: [], slip: 0, vd: 0, pendingOil: null, over: null, time: 0, revDist: 0, dlvT: 0, shake: 0, flash: 0 };
+const inp = { up: false, down: false, left: false, right: false, brake: false };
+const keys = { up: false, down: false, left: false, right: false, brake: false };
+const touch = { up: false, down: false, left: false, right: false, brake: false };
+const mix = () => { for (const k in inp) inp[k] = keys[k] || touch[k]; };
+const STAGES = ['PUBLIC ROAD', 'COMPANY ENTRANCE', 'WORKSHOP YARD', 'LOADING BAY'];
+const stageOf = y => y > -2850 ? 0 : y > -3300 ? 1 : y > -5700 ? 2 : 3;
+
+function resetGame() {
+  G.world = buildWorld(); G.reports = []; G.slip = 0; G.vd = 0; G.pendingOil = null; G.over = null; G.time = 0; G.revDist = 0; G.dlvT = 0; G.shake = 0; G.flash = 0; G.paused = false;
+  const x = 180, y = 0, th = -Math.PI / 2;
+  G.T = { x, y, th, tt: th, v: 0, steer: 0, px: x - Math.cos(th) * HITCH, py: y - Math.sin(th) * HITCH, minY: 0 };
+  syncTow(); G.stage = 0; G.banner = 'PUBLIC ROAD – PRESS FORWARD TO MOVE'; G.bannerT = 4;
+  for (const k in keys) keys[k] = touch[k] = false; document.querySelectorAll('.cb').forEach(b => b.classList.remove('down')); mix();
+  G.cam = y - TRUCK_SCREEN_Y;
+}
+function syncTow() { const T = G.T; T.px = T.x - Math.cos(T.th) * HITCH; T.py = T.y - Math.sin(T.th) * HITCH; T.tx = T.px - Math.cos(T.tt) * TOWC; T.ty = T.py - Math.sin(T.tt) * TOWC; }
+
+/* ------------------------- geometry ------------------------- */
+function corners(cx, cy, hl, hw, a) {
+  const c = Math.cos(a), s = Math.sin(a), out = [];
+  [[1, 1], [1, -1], [-1, -1], [-1, 1]].forEach(m => out.push([cx + c * hl * m[0] - s * hw * m[1], cy + s * hl * m[0] + c * hw * m[1]]));
+  return out;
+}
+function obbHit(A, B) {
+  const axes = [A.a, A.a + Math.PI / 2, B.a, B.a + Math.PI / 2], dx = B.x - A.x, dy = B.y - A.y;
+  for (const ax of axes) {
+    const ux = Math.cos(ax), uy = Math.sin(ax);
+    const rA = A.hl * Math.abs(ux * Math.cos(A.a) + uy * Math.sin(A.a)) + A.hw * Math.abs(-ux * Math.sin(A.a) + uy * Math.cos(A.a));
+    const rB = B.hl * Math.abs(ux * Math.cos(B.a) + uy * Math.sin(B.a)) + B.hw * Math.abs(-ux * Math.sin(B.a) + uy * Math.cos(B.a));
+    if (Math.abs(dx * ux + dy * uy) > rA + rB) return false;
+  }
+  return true;
+}
+function circHit(c, B) {
+  const dx = c.x - B.x, dy = c.y - B.y, co = Math.cos(-B.a), si = Math.sin(-B.a);
+  const lx = dx * co - dy * si, ly = dx * si + dy * co, qx = clamp(lx, -B.hl, B.hl), qy = clamp(ly, -B.hw, B.hw);
+  return (lx - qx) * (lx - qx) + (ly - qy) * (ly - qy) < c.r * c.r;
+}
+const boxes = T => [{ x: T.x, y: T.y, hl: TRK.hl, hw: TRK.hw, a: T.th }, { x: T.tx, y: T.ty, hl: TOW.hl, hw: TOW.hw, a: T.tt }];
+const bounds = y => y > Y_GATE ? [52, 308] : [12, 348];
+const forkBox = f => ({ x: f.x, y: f.y, hl: 21, hw: 11, a: 0 });
+
+function findHit(T) {
+  const bx = boxes(T);
+  // road departure
+  for (const b of bx) for (const c of corners(b.x, b.y, b.hl, b.hw, b.a)) { const [lo, hi] = bounds(c[1]); if (c[0] < lo || c[0] > hi) return { kind: 'road', x: c[0], y: c[1] }; }
+  for (const p of G.world.peds) { if (Math.abs(p.y - T.y) > 160) continue; for (const b of bx) if (circHit({ x: p.x, y: p.y, r: 7 }, b)) return { kind: 'worker', x: p.x, y: p.y }; }
+  for (const f of G.world.forks) { if (Math.abs(f.y - T.y) > 160) continue; const fb = forkBox(f); for (const b of bx) if (obbHit(fb, b)) return { kind: 'fork', x: f.x, y: f.y }; }
+  let best = null;
+  for (const s of G.world.solids) {
+    if (Math.abs(s.cy - T.y) > 260) continue;
+    const sb = { x: s.cx, y: s.cy, hl: s.w / 2, hw: s.h / 2, a: 0 };
+    for (const b of bx) if (obbHit(sb, b)) { const kind = s.k === 'truck' ? 'heavy' : 'prop'; if (!best || kind === 'heavy') best = { kind, x: s.cx, y: s.cy }; }
+  }
+  return best;
+}
+
+/* ------------------------- simulation ------------------------- */
+function moveHazards(dt) {
+  for (const p of G.world.peds) { if (!p.sp) { p.ph += dt * 2; continue; } p.ph += dt * 7; p.x += p.dir * p.sp * dt; if (p.x > p.b) { p.x = p.b; p.dir = -1; } if (p.x < p.a) { p.x = p.a; p.dir = 1; } }
+  for (const f of G.world.forks) { f.x += f.dir * f.sp * dt; if (f.x > f.b) { f.x = f.b; f.dir = -1; } if (f.x < f.a) { f.x = f.a; f.dir = 1; } }
+}
+function sim(dt) {
+  const T = G.T; G.time += dt; G.anim += dt;
+  moveHazards(dt);
+  G.slip = Math.max(0, G.slip - dt);
+  const slipping = G.slip > 0, grip = slipping ? 0.3 : 1;
+  // steering
+  const tgt = (inp.right ? 1 : 0) - (inp.left ? 1 : 0), vf = Math.min(1, Math.abs(T.v) / MAXV);
+  const maxS = (0.58 - 0.28 * vf) * (slipping ? 0.55 : 1);
+  T.steer += (tgt * maxS - T.steer) * Math.min(1, (tgt ? 6 : 9) * dt);
+  // speed
+  if (inp.up) { if (T.v < -1) T.v += 200 * grip * dt; else T.v += 62 * (1 - Math.max(0, T.v) / (MAXV * 1.04)) * dt * (slipping ? .5 : 1); }
+  if (inp.down) { if (T.v > 1) T.v -= 200 * grip * dt; else T.v -= 55 * dt * (slipping ? .5 : 1); }
+  if (inp.brake) { const s = sgn(T.v); T.v -= s * 230 * grip * dt; if (sgn(T.v) !== s) T.v = 0; }
+  if (!inp.up && !inp.down && !inp.brake) T.v -= sgn(T.v) * Math.min(Math.abs(T.v), (slipping ? 12 : 34) * dt);
+  T.v = clamp(T.v, -MAXR, MAXV);
+  // heading + position (kinematic bicycle) + oil slide
+  T.th += T.v * Math.tan(T.steer) / WB * dt;
+  if (slipping) { T.th += G.slipDir * 0.55 * (Math.abs(T.v) / MAXV) * Math.sin(G.slip * 5) * dt; }
+  const nx = Math.sin(T.th), ny = -Math.cos(T.th);
+  T.x += (Math.cos(T.th) * T.v + nx * G.vd) * dt; T.y += (Math.sin(T.th) * T.v + ny * G.vd) * dt;
+  G.vd *= Math.max(0, 1 - 1.1 * dt);
+  if (T.y > 160) { T.y = 160; T.v = Math.min(T.v, 0) === T.v ? 0 : T.v; }
+  // towed truck: tow point follows hitch, its rear axle trails behind
+  const opx = T.px, opy = T.py;
+  T.px = T.x - Math.cos(T.th) * HITCH; T.py = T.y - Math.sin(T.th) * HITCH;
+  const vx = (T.px - opx) / dt, vy = (T.py - opy) / dt;
+  T.tt += ((-Math.sin(T.tt)) * vx + Math.cos(T.tt) * vy) / LT * dt;
+  if (T.v < 0) T.tt += norm(T.th - T.tt) * 0.9 * Math.min(1, -T.v / 35) * dt;         // reversing assist (keeps it drivable, still needs care)
+  if (slipping) T.tt += (Math.random() - .5) * 1.4 * dt * Math.min(1, Math.abs(T.v) / MAXV + .2);
+  const art = norm(T.th - T.tt); G.art = art;
+  if (Math.abs(art) > JK_MAX) { T.tt = T.th - Math.sign(art) * JK_MAX; T.v *= 1 - 1.5 * dt; }
+  T.tx = T.px - Math.cos(T.tt) * TOWC; T.ty = T.py - Math.sin(T.tt) * TOWC;
+  T.minY = Math.min(T.minY, T.y);
+  // stage tracking
+  const sg = stageOf(T.y);
+  if (sg !== G.stage) {
+    G.stage = sg;
+    G.banner = ['PUBLIC ROAD', 'COMPANY ENTRANCE – SLOW DOWN', 'WORKSHOP YARD – WATCH FOR WORKERS & FORKLIFTS', 'LOADING BAY – DRIVE PAST, THEN REVERSE IN'][sg]; G.bannerT = 4.5; sfx.beep(660, .12);
+  }
+  // collisions
+  const hit = findHit(T);
+  if (hit) { crash(hit); return; }
+  // oil near-miss
+  if (!G.pendingOil && !slipping) {
+    for (const o of G.world.oil) {
+      if (o.done || Math.abs(o.y - T.y) > 120) continue;
+      const pts = [[T.x, T.y], [T.px, T.py], [T.tx, T.ty]];
+      if (pts.some(p => Math.hypot(p[0] - o.x, p[1] - o.y) < o.r + 5)) { o.done = true; G.pendingOil = o; G.pendT = 1.3; G.slip = 2.6; G.slipDir = Math.random() < .5 ? -1 : 1; G.vd = G.slipDir * (22 + 40 * Math.min(1, Math.abs(T.v) / MAXV)); G.banner = 'OIL SPILL – LOSS OF TRACTION'; G.bannerT = 3; G.flash = .6; sfx.alarm(); vib(120); break; }
+    }
+  }
+  if (G.pendingOil) { G.pendT -= dt; if (G.pendT <= 0) openReport(); }
+  // delivery
+  if (sg === 3) deliveryCheck(dt, T);
+}
+function deliveryState(T) {
+  const inside = boxes(T).every(b => corners(b.x, b.y, b.hl, b.hw, b.a).every(c => c[0] > BAY.x0 + 1 && c[0] < BAY.x1 - 1 && c[1] > BAY.yTop + 4 && c[1] < BAY.yBack - 1));
+  const rearGap = (() => { const cs = corners(T.tx, T.ty, TOW.hl, TOW.hw, T.tt); return BAY.yBack - Math.max(...cs.map(c => c[1])); })();
+  const aligned = Math.abs(norm(T.th + Math.PI / 2)) < 0.15 && Math.abs(norm(T.th - T.tt)) < 0.15;
+  return { inside, seated: inside && rearGap < 46, aligned, stopped: Math.abs(T.v) < 8, reversed: G.revDist > 40 };
+}
+function deliveryCheck(dt, T) {
+  if (T.v < 0 && T.y < BAY.yBack - 40) G.revDist += -T.v * dt;
+  const d = deliveryState(T); G.dl = d;
+  if (d.seated && d.aligned && d.stopped && d.reversed) G.dlvT += dt; else G.dlvT = Math.max(0, G.dlvT - dt * 2);
+  if (G.dlvT >= 1.0) delivered();
+}
+
+/* ------------------------- state transitions ------------------------- */
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('show', s.id === id)); }
+function zeroInput() { for (const k in keys) keys[k] = touch[k] = false; document.querySelectorAll('.cb').forEach(b => b.classList.remove('down')); mix(); }
+function startGame() { initAudio(); resetGame(); G.state = ST.PLAY; showScreen(null); sfx.beep(520, .15); setTimeout(fit, 0); }
+function crash(hit) {
+  const T = G.T; T.v = 0; T.steer = 0; zeroInput(); G.state = ST.OVER; G.over = hit; G.shake = .5; G.flash = .8; G.pendingOil = null;
+  const m = MSG[hit.kind]; $('ovH').textContent = m[0]; $('ovM').textContent = m[1];
+  $('ovD').textContent = Math.max(0, Math.round(-T.minY / 10)) + ' m'; $('ovN').textContent = G.reports.length;
+  sfx.crash(); vib([200, 80, 200]);
+  setTimeout(() => { if (G.state === ST.OVER) showScreen('sOver'); }, 450);
+}
+function openReport() {
+  const T = G.T; G.state = ST.NEAR; T.v = 0; T.steer = 0; G.vd = 0; zeroInput();
+  const loc = G.pendingOil && G.pendingOil.y < Y_GATE ? 'Workshop yard' : 'Public approach road'; $('nmLoc').value = loc;
+  showScreen('sNear');
+}
+function submitReport() {
+  if (G.state !== ST.NEAR) return;
+  G.reports.push({ type: 'Oil spill – temporary loss of traction', location: $('nmLoc').value, time: Math.round(G.time) });
+  G.pendingOil = null; G.slip = 0; G.vd = 0; G.T.v = 0; G.state = ST.PLAY; showScreen(null);
+  G.banner = 'NEAR-MISS REPORTED – TRACTION RESTORED'; G.bannerT = 2.5; sfx.beep(880, .15);
+}
+function delivered() {
+  const T = G.T; T.v = 0; zeroInput(); G.state = ST.DONE; sfx.win();
+  const t = Math.round(G.time), fmt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  let best = null; try { best = +localStorage.getItem('gpta_best') || null; if (!best || t < best) { best = t; localStorage.setItem('gpta_best', t); } } catch (e) { best = best || t; }
+  $('dnT').textContent = fmt(t); $('dnN').textContent = G.reports.length; $('dnB').textContent = fmt(best);
+  showScreen('sDone');
+}
+function pause(on) {
+  if (on && G.state === ST.PLAY && !G.paused) { G.paused = true; zeroInput(); showScreen('sPause'); }
+  else if (!on && G.paused) { G.paused = false; zeroInput(); showScreen(null); }
+}
+
+/* ------------------------- audio / vibration ------------------------- */
+let AC = null, muted = false;
+function initAudio() { try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { } }
+function tone(f, d, type, vol, slide) { if (!AC || muted) return; try { const o = AC.createOscillator(), g = AC.createGain(); o.type = type || 'square'; o.frequency.value = f; if (slide) o.frequency.linearRampToValueAtTime(slide, AC.currentTime + d); g.gain.value = vol || .05; g.gain.exponentialRampToValueAtTime(.0001, AC.currentTime + d); o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + d); } catch (e) { } }
+const sfx = { beep: (f, d) => tone(f, d || .1, 'square', .04), alarm: () => { tone(880, .12, 'square', .06); setTimeout(() => tone(620, .14, 'square', .06), 130); }, crash: () => tone(160, .5, 'sawtooth', .09, 40), win: () => [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .18, 'square', .06), i * 140)) };
+function vib(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) { } }
+
+/* ------------------------- drawing: sprites ------------------------- */
+const rc = (c, x, y, w, h, col) => { c.fillStyle = col; c.fillRect(x, y, w, h); };
+function drawRecovery(c, flash) {            // faces UP, origin = centre; front y=-30, rear y=+30, lift to y=+44
+  rc(c, -15, -28, 32, 62, 'rgba(0,0,0,.28)');
+  [-22, 2, 16].forEach(y => { rc(c, -19, y, 5, 11, '#101214'); rc(c, 14, y, 5, 11, '#101214'); rc(c, -19, y, 5, 3, '#3a3f46'); rc(c, 14, y, 5, 3, '#3a3f46'); });
+  rc(c, -13, -6, 26, 38, '#2c3036');                                  // chassis + deck
+  rc(c, -11, -4, 22, 34, '#444b55');
+  for (let y = 24; y < 32; y += 4) { rc(c, -11, y, 11, 2, '#ffc21a'); rc(c, 0, y + 2, 11, 2, '#ffc21a'); }  // hazard stripes at rear
+  c.save(); c.translate(0, 10); c.rotate(-Math.PI / 2); c.fillStyle = '#ffe8c7'; c.font = 'bold 6px "Courier New",monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('RECOVERY', 0, 0); c.restore();
+  // rear wheel-lift assembly
+  c.strokeStyle = '#aab3bd'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(-8, 28); c.lineTo(-8, 44); c.moveTo(8, 28); c.lineTo(8, 44); c.stroke();
+  rc(c, -10, 42, 20, 4, '#8a929c'); rc(c, -12, 42, 3, 4, '#ff7a1a'); rc(c, 9, 42, 3, 4, '#ff7a1a');
+  rc(c, -6, 24, 12, 4, '#6b737d');
+  // cab
+  rc(c, -14, -30, 28, 26, '#e8501c'); rc(c, -14, -30, 28, 3, '#222');
+  rc(c, -11, -26, 22, 8, '#9fd8ff'); rc(c, -11, -26, 22, 2, '#d8f1ff'); rc(c, -1, -26, 2, 8, '#6aa8cf');
+  rc(c, -12, -16, 24, 10, '#ff7a35'); rc(c, -12, -8, 24, 2, '#b83a0e');
+  rc(c, -14, -30, 4, 2, '#ffe27a'); rc(c, 10, -30, 4, 2, '#ffe27a');
+  rc(c, -17, -24, 3, 7, '#222'); rc(c, 14, -24, 3, 7, '#222');
+  rc(c, -8, -11, 16, 3, flash ? '#ffb000' : '#7a5300'); rc(c, -8, -11, 3, 3, flash ? '#fff' : '#7a5300');
+}
+function drawHeavy(c, cabCol, cabHi, tarp, lifted, flash) {   // faces UP, origin = front-centre, body extends to y=+104
+  rc(c, -14, 3, 32, 104, 'rgba(0,0,0,.28)');
+  rc(c, -9, 28, 18, 74, '#23272d'); rc(c, -7, 28, 3, 74, '#3a4048'); rc(c, 4, 28, 3, 74, '#3a4048');
+  [76, 91].forEach(y => { rc(c, -20, y, 6, 12, '#101214'); rc(c, 14, y, 6, 12, '#101214'); rc(c, -20, y, 6, 3, '#333'); rc(c, 14, y, 6, 3, '#333'); });
+  if (lifted) { rc(c, -19, 8, 5, 11, '#4b5058'); rc(c, 14, 8, 5, 11, '#4b5058'); } else { rc(c, -20, 10, 6, 12, '#101214'); rc(c, 14, 10, 6, 12, '#101214'); }
+  rc(c, -15, 33, 30, 66, '#3a3f46'); rc(c, -13, 35, 26, 62, tarp);
+  [46, 62, 78].forEach(y => rc(c, -13, y, 26, 2, '#e08a00'));
+  rc(c, -13, 35, 26, 2, 'rgba(255,255,255,.25)');
+  if (lifted) { c.fillStyle = '#e0352b'; c.beginPath(); c.moveTo(0, 52); c.lineTo(7, 66); c.lineTo(-7, 66); c.closePath(); c.fill(); rc(c, -2, 57, 4, 5, '#fff'); }
+  rc(c, -14, 99, 6, 3, '#ff3b30'); rc(c, 8, 99, 6, 3, '#ff3b30'); rc(c, -15, 101, 30, 3, '#222');
+  rc(c, -15, 0, 30, 32, cabCol); rc(c, -15, 0, 30, 3, '#222');
+  rc(c, -12, 4, 24, 8, '#9fd8ff'); rc(c, -12, 4, 24, 2, '#d8f1ff'); rc(c, -1, 4, 2, 8, '#6aa8cf');
+  rc(c, -13, 14, 26, 14, cabHi); rc(c, -12, 28, 24, 3, '#2b2f36');
+  rc(c, -15, 0, 4, 2, '#ffe27a'); rc(c, 11, 0, 4, 2, '#ffe27a');
+  rc(c, -18, 5, 3, 7, '#222'); rc(c, 15, 5, 3, 7, '#222');
+  rc(c, -3, 18, 6, 4, flash ? '#ffb000' : '#7a5300');
+}
+function drawCombo(c, T, flash) {   // draws towed truck, chains and recovery truck in current (world) transform
+  c.save(); c.translate(T.px, T.py); c.rotate(T.tt + Math.PI / 2); drawHeavy(c, '#4f7396', '#7ea2c6', '#c9a86a', true, flash); c.restore();
+  // tow bar + chains (always visible)
+  const fx = Math.cos(T.th), fy = Math.sin(T.th), nx = -fy, ny = fx, tx = Math.cos(T.tt), ty = Math.sin(T.tt), tnx = -ty, tny = tx;
+  const rx = T.x - fx * 30, ry = T.y - fy * 30;
+  c.strokeStyle = '#d0d6dc'; c.lineWidth = 1.5; c.beginPath();
+  [-9, 9].forEach(o => { c.moveTo(rx + nx * o, ry + ny * o); c.lineTo(T.px - tx * 3 + tnx * o * 1.2, T.py - ty * 3 + tny * o * 1.2); }); c.stroke();
+  c.strokeStyle = '#ff7a1a'; c.lineWidth = 3; c.beginPath(); c.moveTo(T.px + nx * 8, T.py + ny * 8); c.lineTo(T.px - tx * 6 + tnx * 9, T.py - ty * 6 + tny * 9); c.moveTo(T.px - nx * 8, T.py - ny * 8); c.lineTo(T.px - tx * 6 - tnx * 9, T.py - ty * 6 - tny * 9); c.stroke();
+  c.fillStyle = '#ffc21a'; c.beginPath(); c.arc(T.px, T.py, 3.2, 0, 7); c.fill(); c.strokeStyle = '#000'; c.lineWidth = 1; c.stroke();
+  c.save(); c.translate(T.x, T.y); c.rotate(T.th + Math.PI / 2); drawRecovery(c, flash); c.restore();
+}
+function drawWorker(c, p) {
+  c.save(); c.translate(p.x, p.y); const sw = p.sp ? Math.sin(p.ph) * 2.2 : 0;
+  rc(c, -8, -4, 16, 10, 'rgba(0,0,0,.25)');
+  rc(c, -9 + sw, 2, 3, 3, '#222'); rc(c, 6 - sw, 2, 3, 3, '#222');                    // feet
+  c.fillStyle = '#ff8a00'; c.beginPath(); c.ellipse(0, 0, 8, 5.5, 0, 0, 7); c.fill();  // hi-vis vest
+  rc(c, -8, -1, 16, 1.6, '#f4f4c8'); rc(c, -1.2, -5, 2.4, 10, '#f4f4c8');             // reflective strips
+  rc(c, -10, -1 + sw, 3, 5, '#ff8a00'); rc(c, 7, -1 - sw, 3, 5, '#ff8a00');          // arms
+  c.fillStyle = '#e6b88a'; c.beginPath(); c.arc(0, 0, 3.3, 0, 7); c.fill();
+  c.fillStyle = '#ffd400'; c.beginPath(); c.arc(0, -0.4, 3.6, Math.PI, 0); c.fill(); c.fillRect(-3.6, -0.4, 7.2, 1); // hard hat
+  c.restore();
+}
+function drawForklift(c, f) {
+  c.save(); c.translate(f.x, f.y); if (f.dir < 0) c.scale(-1, 1);
+  rc(c, -20, -9, 42, 24, 'rgba(0,0,0,.25)');
+  rc(c, 8, -7, 5, 3, '#9aa3ad'); rc(c, 8, 4, 5, 3, '#9aa3ad');                       // fork tines
+  rc(c, 13, -7, 8, 2.5, '#c9d0d8'); rc(c, 13, 4.5, 8, 2.5, '#c9d0d8');
+  rc(c, 6, -9, 3, 18, '#444b55');                                                    // mast
+  rc(c, -16, -9, 6, 4, '#111'); rc(c, -16, 5, 6, 4, '#111'); rc(c, 0, -10, 7, 4, '#111'); rc(c, 0, 6, 7, 4, '#111'); // wheels
+  rc(c, -17, -7, 24, 14, '#ffc21a'); rc(c, -17, -7, 24, 2, '#ffe27a');
+  rc(c, -20, -6, 5, 12, '#2b2f36');                                                  // counterweight
+  rc(c, -9, -5, 12, 10, '#1d2128'); rc(c, -7, -3, 8, 6, '#3a8fd9');                  // seat / driver
+  c.strokeStyle = '#2b2f36'; c.lineWidth = 1.4; c.strokeRect(-9, -6, 13, 12);        // overhead guard
+  const bl = (Math.floor(G.anim * 3) % 2) ? '#ff9800' : '#7a4a00'; rc(c, -3, -1, 3, 3, bl);
+  c.restore();
+}
+function drawCone(c, s) { const x = s.cx, y = s.cy; rc(c, x - 6, y - 5, 12, 12, 'rgba(0,0,0,.25)'); rc(c, x - 5, y - 5, 10, 10, '#ff6a00'); rc(c, x - 5, y - 5, 10, 2, '#ff9a40'); c.fillStyle = '#fff'; c.beginPath(); c.arc(x, y, 3.2, 0, 7); c.fill(); c.fillStyle = '#ff6a00'; c.beginPath(); c.arc(x, y, 1.6, 0, 7); c.fill(); }
+function drawBarrier(c, s) {
+  c.save(); c.beginPath(); c.rect(s.x, s.y, s.w, s.h); c.clip(); rc(c, s.x, s.y, s.w, s.h, '#f4f4f4');
+  c.fillStyle = '#e0352b'; for (let x = s.x - s.h; x < s.x + s.w; x += 16) { c.beginPath(); c.moveTo(x, s.y + s.h); c.lineTo(x + 8, s.y + s.h); c.lineTo(x + 8 + s.h, s.y); c.lineTo(x + s.h, s.y); c.closePath(); c.fill(); }
+  c.restore(); c.strokeStyle = '#111'; c.lineWidth = 1.5; c.strokeRect(s.x, s.y, s.w, s.h); rc(c, s.x, s.y + s.h, s.w, 3, 'rgba(0,0,0,.3)');
+  rc(c, s.x + 2, s.y - 3, 4, 3, '#ffb000'); rc(c, s.x + s.w - 6, s.y - 3, 4, 3, '#ffb000');
+}
+function drawEquip(c, s) {
+  const x = s.x, y = s.y, w = s.w; rc(c, x + 1, y + 2, w, w, 'rgba(0,0,0,.25)');
+  if (s.t === 'drums') { [[6, 6], [16, 7], [10, 16]].forEach(p => { c.fillStyle = '#2a6fb5'; c.beginPath(); c.arc(x + p[0], y + p[1], 5, 0, 7); c.fill(); c.strokeStyle = '#0b2f55'; c.lineWidth = 1; c.stroke(); c.fillStyle = '#7fb6ea'; c.beginPath(); c.arc(x + p[0], y + p[1], 2, 0, 7); c.fill(); }); }
+  else if (s.t === 'tyres') { c.fillStyle = '#16181b'; c.beginPath(); c.arc(x + w / 2, y + w / 2, w / 2, 0, 7); c.fill(); c.fillStyle = '#444'; c.beginPath(); c.arc(x + w / 2, y + w / 2, w / 4, 0, 7); c.fill(); c.fillStyle = '#16181b'; c.beginPath(); c.arc(x + w / 2, y + w / 2, w / 8, 0, 7); c.fill(); }
+  else if (s.t === 'comp') { rc(c, x, y, w, w, '#c0392b'); rc(c, x, y, w, 3, '#e8685a'); rc(c, x + 3, y + 6, w - 6, 8, '#2b2f36'); c.fillStyle = '#fff'; c.beginPath(); c.arc(x + w - 7, y + 17, 3, 0, 7); c.fill(); }
+  else { rc(c, x, y, w, w, '#3b4048'); rc(c, x + 2, y + 2, w - 4, 6, '#6b737d'); rc(c, x + 3, y + 11, 5, 9, '#ffc21a'); rc(c, x + 11, y + 11, 8, 9, '#e0352b'); }
+}
+function drawParked(c, s) {
+  c.save(); c.translate(s.x + s.w / 2, s.y); if (s.flip) { c.translate(0, s.h); c.scale(1, -1); }
+  drawHeavy(c, s.cab, s.cab, ['#9aa7b4', '#c9a86a', '#7e8b62'][Math.floor(Math.abs(s.x + s.y) / 7) % 3], false, false); c.restore();
+}
+function drawOil(c, o, t) {
+  c.save(); c.translate(o.x, o.y); const r = o.r;
+  c.fillStyle = o.done ? '#1a1b1d' : '#0d0e10'; c.beginPath(); for (let i = 0; i <= 18; i++) { const a = i / 18 * Math.PI * 2, rr = r * (0.85 + 0.15 * Math.sin(a * 3 + o.seed)); c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr * .8); } c.fill();
+  c.globalAlpha = .55; ['#7a3df0', '#18c3a5', '#e86a1a'].forEach((col, i) => { c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.ellipse(-r * .15 + i * 2, -r * .1, r * (.5 - i * .1), r * (.3 - i * .05), .4 + i * .3 + Math.sin(t + i) * .1, 0, 5); c.stroke(); }); c.globalAlpha = 1;
+  c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(-r * .5, -r * .35, 4, 2);
+  c.restore();
+}
+
+/* ------------------------- drawing: world ------------------------- */
+const cv = $('cv'), ctx = cv.getContext('2d'); let VS = 1;
+function drawGround(c, cam) {
+  const yTopW = cam, yBotW = cam + H;
+  // ---- public road region (y > Y_GATE)
+  if (yBotW > Y_GATE) {
+    const sy = Math.max(0, Y_GATE - cam);
+    c.save(); c.beginPath(); c.rect(0, sy, W, H - sy); c.clip();
+    rc(c, 0, 0, W, H, '#3d6b35');
+    for (let y = Math.floor(yTopW / 24) * 24; y < yBotW; y += 24) for (let x = 0; x < 60; x += 12) { if (hash(y * .37 + x) > .55) { rc(c, x + (hash(y + x) * 8 | 0), y - cam, 3, 2, '#4a7c40'); rc(c, 300 + x + (hash(y - x) * 8 | 0), y - cam, 3, 2, '#2f5a2a'); } }
+    rc(c, 52, 0, 256, H, '#b9a77a'); rc(c, 52, 0, 256, H, '#8d8b84');          // shoulders
+    rc(c, 65, 0, 230, H, '#3a3d42');                                           // asphalt
+    for (let y = Math.floor(yTopW / 16) * 16; y < yBotW; y += 16) { const h = hash(y * .13); if (h > .7) rc(c, 65 + hash(y) * 220, y - cam, 3, 1, '#4a4e54'); }
+    rc(c, 65, 0, 3, H, '#f2f2f2'); rc(c, 292, 0, 3, H, '#f2f2f2');
+    for (let y = Math.floor(yTopW / 44) * 44; y < yBotW; y += 44) rc(c, 178, y - cam, 4, 24, '#ffd84a');   // scrolling centre line
+    // approach markings
+    for (let k = -2860; k > -3040; k -= 30) { const yy = k - cam; c.fillStyle = '#ffd84a'; c.beginPath(); c.moveTo(70, yy); c.lineTo(76, yy); c.lineTo(100, yy - 20); c.lineTo(94, yy - 20); c.fill(); c.beginPath(); c.moveTo(290, yy); c.lineTo(284, yy); c.lineTo(260, yy - 20); c.lineTo(266, yy - 20); c.fill(); }
+    c.fillStyle = '#fff'; c.font = 'bold 12px "Courier New",monospace'; c.textAlign = 'center';
+    [[-2880, 'SLOW'], [-1150, 'WORKSHOP 2 km'], [-200, 'RECOVERY ROUTE']].forEach(m => { c.save(); c.translate(180, m[0] - cam); c.scale(1, 1.7); c.fillText(m[1], 0, 0); c.restore(); });
+    // roadside scenery
+    for (let y = Math.floor(yTopW / 70) * 70; y < yBotW; y += 70) {
+      const i = Math.floor(y / 70), tl = hash(i * 3.1), tr = hash(i * 5.7);
+      if (y > Y_GATE - 60) {
+        if (tl > .25) tree(c, 10 + hash(i) * 28, y - cam + tl * 40, 10 + tl * 8);
+        if (tr > .25) tree(c, 322 + hash(i + 9) * 28, y - cam + tr * 40, 10 + tr * 8);
+      }
+    }
+    for (let y = Math.floor(yTopW / 140) * 140; y < yBotW; y += 140) { rc(c, 308, y - cam, 3, 12, '#c9c9c9'); rc(c, 52, y - cam + 70, 3, 12, '#c9c9c9'); }   // guide posts
+    [[-600, 'L', '60'], [-1700, 'R', '60']].forEach(s => { const x = s[1] === 'L' ? 36 : 324, y = s[0] - cam; rc(c, x - 1, y, 2, 14, '#888'); c.fillStyle = '#fff'; c.beginPath(); c.arc(x, y - 6, 9, 0, 7); c.fill(); c.strokeStyle = '#d02020'; c.lineWidth = 3; c.stroke(); c.fillStyle = '#111'; c.font = 'bold 9px monospace'; c.textAlign = 'center'; c.fillText(s[2], x, y - 3); });
+    // company sign by the road (stage 2)
+    { const y = -2960 - cam; rc(c, 14, y, 3, 20, '#777'); rc(c, 36, y, 3, 20, '#777'); rc(c, 6, y - 24, 40, 24, '#14171c'); c.strokeStyle = '#ffc21a'; c.lineWidth = 2; c.strokeRect(6, y - 24, 40, 24); c.fillStyle = '#ffc21a'; c.font = 'bold 7px "Courier New",monospace'; c.textAlign = 'center'; c.fillText('GP TRUCK', 26, y - 14); c.fillText('AID  ►', 26, y - 5); }
+    c.restore();
+  }
+  // ---- yard region (y <= Y_GATE)
+  if (yTopW < Y_GATE) {
+    const ey = Math.min(H, Y_GATE - cam);
+    c.save(); c.beginPath(); c.rect(0, 0, W, ey); c.clip();
+    rc(c, 0, 0, W, H, '#7b7e82');
+    for (let y = Math.floor(yTopW / 60) * 60; y < yBotW; y += 60) { rc(c, 0, y - cam, W, 1, '#6c6f73'); for (let x = 0; x < W; x += 60) rc(c, x + ((y / 60) & 1) * 30, y - cam, 1, 60, '#6c6f73'); }
+    for (let y = Math.floor(yTopW / 31) * 31; y < yBotW; y += 31) if (hash(y * .9) > .6) rc(c, hash(y) * 340, y - cam, 6, 2, '#6f7276');
+    // workshop walls (left/right edge)
+    rc(c, 0, 0, 12, H, '#2d333b'); rc(c, 348, 0, 12, H, '#2d333b');
+    for (let y = Math.floor(yTopW / 120) * 120; y < yBotW; y += 120) { rc(c, 0, y - cam + 20, 10, 60, '#4b5563'); rc(c, 350, y - cam + 20, 10, 60, '#4b5563'); for (let k = 0; k < 6; k++) { rc(c, 0, y - cam + 20 + k * 10, 10, 1, '#2d333b'); rc(c, 350, y - cam + 20 + k * 10, 10, 1, '#2d333b'); } }
+    rc(c, 12, 0, 2, H, '#ffc21a'); rc(c, 346, 0, 2, H, '#ffc21a');
+    // drive-lane edges (yellow dashes) and parking bays
+    for (let y = Math.floor(yTopW / 28) * 28; y < yBotW; y += 28) { rc(c, 62, y - cam, 2, 16, '#ffd84a'); rc(c, 296, y - cam, 2, 16, '#ffd84a'); }
+    for (let y = Math.floor(yTopW / 102) * 102; y < yBotW; y += 102) { rc(c, 14, y - cam, 40, 1, '#e8e8e8'); rc(c, 306, y - cam, 40, 1, '#e8e8e8'); }
+    // zebra crossings + hazard stripes at worker/forklift rows
+    G.world && G.world.peds.forEach(p => { if (p.sp) for (let x = 70; x < 290; x += 16) rc(c, x, p.y - 14 - cam, 8, 28, '#e6e6e6'); });
+    G.world && G.world.forks.forEach(f => { for (let x = 64; x < 296; x += 14) rc(c, x, f.y - 17 - cam, 7, 2, '#ffd84a'); for (let x = 64; x < 296; x += 14) rc(c, x, f.y + 15 - cam, 7, 2, '#ffd84a'); });
+    // approach: gate threshold hatch
+    for (let x = 59; x < 301; x += 20) { c.fillStyle = '#ffd84a'; c.beginPath(); c.moveTo(x, Y_GATE - cam - 6); c.lineTo(x + 8, Y_GATE - cam - 6); c.lineTo(x + 18, Y_GATE - cam - 26); c.lineTo(x + 10, Y_GATE - cam - 26); c.fill(); }
+    // loading bay & apron
+    { const by = BAY.yTop - cam, bb = BAY.yBack - cam;
+      rc(c, BAY.x0, by, BAY.x1 - BAY.x0, bb - by, '#5d6166'); rc(c, BAY.x0, by, BAY.x1 - BAY.x0, 3, '#ffd84a'); rc(c, BAY.x0 + 6, by, 2, bb - by, '#ffd84a'); rc(c, BAY.x1 - 8, by, 2, bb - by, '#ffd84a');
+      for (let y = BAY.yTop + 20; y < BAY.yBack - 30; y += 30) rc(c, (BAY.x0 + BAY.x1) / 2 - 1, y - cam, 3, 16, '#ffd84a');            // centre guide
+      rc(c, BAY.x0 + 8, bb - 26, BAY.x1 - BAY.x0 - 16, 6, '#111'); for (let x = BAY.x0 + 8; x < BAY.x1 - 16; x += 12) rc(c, x, bb - 26, 6, 6, '#ffc21a');   // wheel stop
+      const ok = G.dl && G.dl.seated && G.dl.aligned; c.globalAlpha = .12 + .06 * Math.sin(G.anim * 5); rc(c, BAY.x0 + 8, by + 6, BAY.x1 - BAY.x0 - 16, bb - by - 36, ok ? '#4cd964' : '#ffc21a'); c.globalAlpha = 1;
+      c.fillStyle = '#ffd84a'; c.font = 'bold 12px "Courier New",monospace'; c.textAlign = 'center'; c.fillText('BAY 1', (BAY.x0 + BAY.x1) / 2, by + 20);
+      c.fillStyle = '#fff'; c.fillText('▼ REVERSE IN ▼', (BAY.x0 + BAY.x1) / 2, by + 36);
+      c.fillStyle = '#ffd84a'; for (let k = 0; k < 3; k++) { const yy = BAY.yTop - 30 - k * 24 - cam; c.beginPath(); c.moveTo(130, yy); c.lineTo(150, yy - 12); c.lineTo(110, yy - 12); c.fill(); }
+      c.save(); c.translate(270, -5900 - cam); c.scale(1, 1.6); c.fillStyle = '#fff'; c.font = 'bold 11px "Courier New",monospace'; c.fillText('LOADING BAY', 0, 0); c.restore();
+      for (let x = 190; x < 348; x += 22) { rc(c, x, -5700 - cam, 11, 3, '#ffd84a'); }
+    }
+    c.restore();
+  }
+  // transition: gate gantry + company sign
+  const gy = Y_GATE - cam;
+  if (gy > -40 && gy < H + 40) {
+    rc(c, 54, gy - 10, 252, 20, 'rgba(0,0,0,.22)');
+    rc(c, 59, gy - 8, 16, 16, '#3a3f46'); rc(c, 61, gy - 6, 12, 12, '#555c66'); rc(c, 285, gy - 8, 16, 16, '#3a3f46'); rc(c, 287, gy - 6, 12, 12, '#555c66');
+    rc(c, 12, gy - 3, 47, 6, '#8a929c'); rc(c, 301, gy - 3, 47, 6, '#8a929c'); for (let x = 14; x < 59; x += 6) { rc(c, x, gy - 3, 1, 6, '#444'); } for (let x = 303; x < 348; x += 6) { rc(c, x, gy - 3, 1, 6, '#444'); }
+    rc(c, 68, gy - 12, 224, 14, '#14171c'); c.strokeStyle = '#ffc21a'; c.lineWidth = 2; c.strokeRect(68, gy - 12, 224, 14); c.fillStyle = '#ffc21a'; c.font = 'bold 10px "Courier New",monospace'; c.textAlign = 'center'; c.fillText('GP TRUCK AID – WORKSHOP', 180, gy - 2);
+  }
+}
+function tree(c, x, y, r) { c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.arc(x + 3, y + 4, r, 0, 7); c.fill(); c.fillStyle = '#2a5a2a'; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); c.fillStyle = '#3f7d3a'; c.beginPath(); c.arc(x - r * .25, y - r * .25, r * .62, 0, 7); c.fill(); c.fillStyle = '#5a9a50'; c.fillRect(x - r * .4, y - r * .5, 2, 2); }
+
+function drawSolids(c, cam) {
+  for (const s of G.world.solids) {
+    if (s.y + s.h < cam - 10 || s.y > cam + H + 10) continue;
+    if (s.k === 'cone') drawCone(c, s);
+    else if (s.k === 'barrier') drawBarrier(c, s);
+    else if (s.k === 'truck') drawParked(c, s);
+    else if (s.k === 'equip') drawEquip(c, s);
+    else if (s.k === 'bay') {
+      rc(c, s.x, s.y, s.w, s.h, '#464c55'); rc(c, s.x, s.y, s.w, 3, '#6b737d');
+      c.save(); c.beginPath(); c.rect(s.x, s.y, s.w, s.h); c.clip(); c.fillStyle = '#ffc21a'; const st = s.w > s.h ? 16 : 16;
+      if (s.w <= 20) { for (let y = s.y; y < s.y + s.h; y += 20) { c.beginPath(); c.moveTo(s.x, y); c.lineTo(s.x + s.w, y + s.w); c.lineTo(s.x + s.w, y + s.w + 8); c.lineTo(s.x, y + 8); c.fill(); } }
+      else if (s.h <= 20) { for (let x = s.x; x < s.x + s.w; x += 20) { c.beginPath(); c.moveTo(x, s.y); c.lineTo(x + 8, s.y); c.lineTo(x + 8 + s.h, s.y + s.h); c.lineTo(x + s.h, s.y + s.h); c.fill(); } }
+      else { for (let y = s.y + 20; y < s.y + s.h - 30; y += 60) { rc(c, s.x + 8, y, s.w - 16, 36, '#2b2f36'); for (let k = 0; k < 4; k++) rc(c, s.x + 8, y + k * 9, s.w - 16, 1, '#555c66'); } c.fillStyle = '#ffc21a'; c.font = 'bold 8px "Courier New",monospace'; c.textAlign = 'center'; c.fillText('WORKSHOP', s.x + s.w / 2, s.y + 12); }
+      c.restore();
+    }
+    else if (s.k === 'fence' && s.y > Y_GATE + 100 || (s.k === 'fence' && s.y < Y_BAY_END + 40)) { rc(c, s.x, s.y, s.w, s.h, '#2b2f36'); for (let x = s.x; x < s.x + s.w; x += 14) { rc(c, x, s.y, 7, s.h, '#ffc21a'); } }
+  }
+}
+function drawHazards(c, cam) {
+  G.world.oil.forEach(o => { if (o.y > cam - 40 && o.y < cam + H + 40) drawOil(c, o, G.anim); });
+  G.world.peds.forEach(p => { if (p.y > cam - 20 && p.y < cam + H + 20) drawWorker(c, p); });
+  G.world.forks.forEach(f => { if (f.y > cam - 20 && f.y < cam + H + 20) drawForklift(c, f); });
+}
+
+/* ------------------------- HUD (canvas) ------------------------- */
+function text(c, s, x, y, size, col, align) { c.font = 'bold ' + size + 'px "Courier New",monospace'; c.textAlign = align || 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = '#000'; c.fillText(s, x + 1, y + 1); c.fillStyle = col; c.fillText(s, x, y); }
+function drawHud(c) {
+  const T = G.T;
+  rc(c, 0, 0, W, 44, 'rgba(14,16,20,.92)'); rc(c, 0, 44, W, 2, '#ffc21a'); rc(c, 0, 46, W, 1, '#000');
+  text(c, 'STAGE ' + (G.stage + 1) + '/4', 6, 13, 9, '#9aa3ad'); text(c, STAGES[G.stage], 6, 27, 12, '#ffc21a');
+  const kmh = Math.round(Math.abs(T.v) * 0.6), gear = T.v < -1 ? 'R' : Math.abs(T.v) < 1 ? 'N' : 'D';
+  text(c, 'KM/H', 150, 13, 9, '#9aa3ad'); text(c, String(kmh).padStart(2, '0'), 150, 29, 18, kmh > 60 ? '#ff7a1a' : '#fff'); text(c, gear, 184, 29, 14, gear === 'R' ? '#ffcf6b' : '#7dff9a');
+  text(c, 'DIST', 208, 13, 9, '#9aa3ad'); text(c, Math.max(0, Math.round(-T.y / 10)) + 'm', 208, 28, 12, '#fff');
+  text(c, 'NEAR-MISS', 6, 41, 8, '#9aa3ad'); text(c, String(G.reports.length), 62, 41, 8, '#ffc21a');
+  // progress bar
+  const pr = clamp(-T.y / 6000, 0, 1); rc(c, 100, 36, 140, 5, '#2a303a'); rc(c, 100, 36, 140 * pr, 5, '#ff7a1a'); [-3050, -5700].forEach(y => rc(c, 100 + 140 * (-y / 6000), 34, 1, 9, '#fff'));
+  // articulation gauge
+  const art = G.art || 0, ax = 262, ay = 36; c.strokeStyle = '#555'; c.lineWidth = 2; c.beginPath(); c.arc(ax, ay, 14, Math.PI, 0); c.stroke();
+  const aa = Math.abs(art); c.strokeStyle = aa > JK_WARN ? '#e0352b' : aa > .6 ? '#ff7a1a' : '#4cd964'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(ax, ay); c.lineTo(ax + Math.sin(art) * 13, ay - Math.cos(art) * 13); c.stroke();
+  text(c, 'ARTIC', ax, 12, 7, '#9aa3ad', 'center');
+  // banner
+  if (G.bannerT > 0 && G.state !== ST.MENU) {
+    const warn = /OIL|JACK/.test(G.banner), a = Math.min(1, G.bannerT);
+    c.globalAlpha = a; const bw = Math.min(W - 16, 12 + G.banner.length * 7); rc(c, (W - bw) / 2, 58, bw, 24, warn ? (Math.floor(G.anim * 6) % 2 ? '#e0352b' : '#8f1b14') : 'rgba(14,16,20,.9)'); c.strokeStyle = warn ? '#fff' : '#ffc21a'; c.lineWidth = 2; c.strokeRect((W - bw) / 2, 58, bw, 24);
+    text(c, G.banner, W / 2, 74, 11, '#fff', 'center'); c.globalAlpha = 1;
+  }
+  if (Math.abs(art) > JK_WARN && G.state === ST.PLAY) { rc(c, 40, 88, W - 80, 20, Math.floor(G.anim * 8) % 2 ? '#e0352b' : '#8f1b14'); text(c, '⚠ JACKKNIFE WARNING – EASE OFF', W / 2, 102, 10, '#fff', 'center'); }
+  if (G.state === ST.PLAY && Math.abs(T.v) < .5 && G.time < 20 && !G.slip) { text(c, G.stage === 0 && -T.y < 5 ? 'PRESS ▲ FORWARD TO MOVE' : '', W / 2, 560, 12, '#ffc21a', 'center'); }
+  // oil slip indicator
+  if (G.slip > 0 && G.state === ST.PLAY) { rc(c, 90, 112, 180, 16, 'rgba(224,53,43,.85)'); text(c, 'LOW GRIP – DO NOT BRAKE HARD', W / 2, 124, 9, '#fff', 'center'); }
+  // delivery checklist
+  if (G.stage === 3 && G.dl && G.state === ST.PLAY) {
+    const d = G.dl, items = [['IN BAY', d.inside], ['SEATED', d.seated], ['STRAIGHT', d.aligned], ['STOPPED', d.stopped], ['REVERSED', d.reversed]];
+    rc(c, 4, H - 22, W - 8, 18, 'rgba(14,16,20,.9)'); items.forEach((it, i) => text(c, (it[1] ? '✔ ' : '✖ ') + it[0], 10 + i * 70, H - 9, 8, it[1] ? '#7dff9a' : '#ff8a7a'));
+    if (G.dlvT > 0) { rc(c, 4, H - 26, (W - 8) * Math.min(1, G.dlvT), 3, '#4cd964'); }
+  }
+  if (G.stage === 3 && G.state === ST.PLAY && !G.dl) { }
+}
+
+/* ------------------------- frame ------------------------- */
+function draw() {
+  const c = ctx; c.setTransform(VS, 0, 0, VS, 0, 0); c.imageSmoothingEnabled = false;
+  if (!G.world) { c.fillStyle = '#222'; c.fillRect(0, 0, W, H); return; }
+  const T = G.T; const target = T.y - TRUCK_SCREEN_Y - Math.max(0, Math.min(40, T.v * .15)); G.cam += (target - G.cam) * .25; const cam = Math.round(G.cam);
+  c.save(); if (G.shake > 0) c.translate((Math.random() - .5) * 8 * G.shake * 2, (Math.random() - .5) * 8 * G.shake * 2);
+  drawGround(c, cam);
+  c.save(); c.translate(0, -cam);
+  drawSolids(c, cam); drawHazards(c, cam);
+  drawCombo(c, T, Math.floor(G.anim * 3) % 2 === 0);
+  if (G.over) { c.fillStyle = '#ff3b30'; c.globalAlpha = .6 + .4 * Math.sin(G.anim * 12); c.beginPath(); c.arc(G.over.x, G.over.y, 14, 0, 7); c.fill(); c.globalAlpha = 1; text(c, '✖', G.over.x, G.over.y + 6, 18, '#fff', 'center'); }
+  c.restore(); c.restore();
+  if (G.flash > 0) { c.fillStyle = 'rgba(255,60,40,' + G.flash * .35 + ')'; c.fillRect(0, 0, W, H); }
+  // vignette
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(0,0,0,.25)'); g.addColorStop(.2, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  drawHud(c);
+  if (G.state === ST.OVER) { c.fillStyle = 'rgba(120,0,0,.25)'; c.fillRect(0, 0, W, H); }
+}
+let last = 0;
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (ts - last) / 1000 || .016); last = ts;
+  G.anim += G.state === ST.PLAY ? 0 : dt; G.bannerT = Math.max(0, G.bannerT - dt); G.shake = Math.max(0, G.shake - dt); G.flash = Math.max(0, G.flash - dt);
+  if (G.state === ST.PLAY && !G.paused) { const n = Math.max(1, Math.ceil(dt / (1 / 120))); for (let i = 0; i < n && G.state === ST.PLAY; i++) sim(dt / n); }
+  draw();
+}
+
+/* ------------------------- layout ------------------------- */
+function fit() {
+  const st = $('stage'), cw = st.clientWidth, ch = st.clientHeight; if (!cw || !ch) return;
+  const s = Math.min(cw / W, ch / H, 1.9), w = Math.floor(W * s), h = Math.floor(H * s), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  $('wrap').style.width = w + 'px'; $('wrap').style.height = h + 'px';
+  VS = s * dpr; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+}
+/* ------------------------- menu illustration ------------------------- */
+function drawIllustration() {
+  const c = $('ill').getContext('2d'); c.imageSmoothingEnabled = false;
+  rc(c, 0, 0, 320, 96, '#3d6b35'); rc(c, 0, 14, 320, 68, '#3a3d42'); rc(c, 0, 14, 320, 3, '#f2f2f2'); rc(c, 0, 79, 320, 3, '#f2f2f2'); for (let x = 0; x < 320; x += 36) rc(c, x, 46, 20, 3, '#ffd84a');
+  const T = { x: 232, y: 48, th: 0, tt: 0 }; T.px = T.x - HITCH; T.py = T.y; T.tx = T.px - TOWC; T.ty = T.py;
+  c.save(); drawCombo(c, T, true); c.restore();
+  c.fillStyle = '#ff6a00'; [[40, 28], [56, 66]].forEach(p => { c.beginPath(); c.arc(p[0], p[1], 4, 0, 7); c.fill(); });
+}
+/* ------------------------- input wiring (single set of handlers) ------------------------- */
+function bindControls() {
+  document.querySelectorAll('.cb').forEach(b => {
+    const k = b.dataset.k;
+    const on = e => { e.preventDefault(); initAudio(); touch[k] = true; b.classList.add('down'); mix(); try { b.setPointerCapture(e.pointerId); } catch (x) { } };
+    const off = e => { e.preventDefault && e.preventDefault(); touch[k] = false; b.classList.remove('down'); mix(); };
+    b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off); b.addEventListener('contextmenu', e => e.preventDefault());
+  });
+  const map = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', Space: 'brake' };
+  addEventListener('keydown', e => {
+    if (map[e.code]) { e.preventDefault(); keys[map[e.code]] = true; mix(); return; }
+    if (e.code === 'KeyP' || e.code === 'Escape') { G.paused ? pause(false) : pause(true); }
+    if (e.code === 'KeyR' && G.state === ST.OVER) startGame();
+  });
+  addEventListener('keyup', e => { if (map[e.code]) { e.preventDefault(); keys[map[e.code]] = false; mix(); } });
+  const release = () => { zeroInput(); if (G.state === ST.PLAY) pause(true); };
+  addEventListener('blur', release); document.addEventListener('visibilitychange', () => { if (document.hidden) release(); });
+  document.addEventListener('touchmove', e => { if (G.state === ST.PLAY) e.preventDefault(); }, { passive: false });
+  $('btnStart').addEventListener('click', startGame);
+  $('btnRestart').addEventListener('click', startGame);
+  $('btnAgain').addEventListener('click', startGame);
+  $('btnReport').addEventListener('click', submitReport);
+  $('btnResume').addEventListener('click', () => pause(false));
+  $('btnQuit').addEventListener('click', () => { G.paused = false; startGame(); });
+  $('pauseBtn').addEventListener('click', () => { G.paused ? pause(false) : pause(true); });
+  $('muteBtn').addEventListener('click', () => { muted = !muted; $('muteBtn').style.opacity = muted ? .4 : 1; });
+  addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 150));
+  if (window.ResizeObserver) new ResizeObserver(fit).observe($('stage'));
+}
+resetGame(); G.state = ST.MENU; bindControls(); fit(); drawIllustration(); requestAnimationFrame(frame);
+window.__dbg = { G, inp, keys, sim, resetGame, startGame, findHit, deliveryState, norm, ST, BAY, openReport, submitReport };
+</script>
+</body>
+</html>

@@ -1,0 +1,1137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop Snake</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:15px;background:#211333;color:#fff;font-family:"Courier New",monospace;text-align:center}
+h1{margin:8px 0 2px;color:#ffe36e;font-size:clamp(25px,6vw,38px);letter-spacing:3px}
+.subtitle{color:#cbb8ed;font-size:12px;margin-bottom:15px}
+.game-wrap{width:100%;max-width:720px;margin:auto;position:relative}
+.stats{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 0;position:relative;z-index:2}
+.stat{flex:1;min-width:85px;padding:9px 5px;background:#38244f;border:1px solid #76559c;border-radius:7px;color:#ffe36e;font-size:13px}
+.stat span{display:block;color:white;font-size:18px;margin-top:3px}
+.collection-notice{position:absolute;z-index:30;top:50%;left:50%;transform:translate(-50%,-50%) scale(.65);width:92%;max-width:430px;padding:18px 12px;background:#302052f7;border:3px solid #ffe36e;border-radius:12px;box-shadow:0 0 25px #ffe36eaa,0 0 50px #000d;opacity:0;pointer-events:none;text-align:center}
+.collection-notice.show{animation:collectionPop 1.65s ease forwards}
+.collection-name{color:#ffe36e;font-size:clamp(17px,4.5vw,24px);font-weight:bold;line-height:1.3;text-shadow:0 0 10px #ffe36e88}
+.collection-points{color:#83ff9b;font-size:22px;font-weight:bold;margin-top:7px}
+.collection-label{color:#d7c5f0;font-size:9px;margin-top:5px;letter-spacing:2px}
+@keyframes collectionPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.65)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}22%{opacity:1;transform:translate(-50%,-50%) scale(1)}78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}
+.sound-row{margin:8px 0 12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:7px;padding:11px 17px;background:#ffe36e;color:#241533;font-family:inherit;font-weight:bold;cursor:pointer;touch-action:manipulation}
+button:active{transform:scale(.96)}
+.sound-button{background:#7653a1;color:white;border:1px solid #b89bdb;padding:8px 16px}
+.pause-button{background:#d49b45;color:#241533;border:1px solid #ffe0a0;padding:8px 16px}
+.pause-button:disabled{opacity:.45;cursor:default}
+canvas{width:100%;max-width:600px;height:auto;display:block;margin:auto;background:#171021;border:3px solid #9a77c2;border-radius:8px;box-shadow:0 0 20px #0008;touch-action:none}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;background:#160d22ef;border-radius:8px;z-index:5}
+.panel{width:100%;max-width:460px;max-height:100%;overflow-y:auto;padding:18px;background:#34204a;border:2px solid #9872c5;border-radius:10px;box-shadow:0 0 25px #0009}
+.panel h2{color:#ffe36e;font-size:27px;margin:5px 0 10px}
+.panel p{color:#eee2ff;font-size:13px;line-height:1.5}
+.start-button{display:block;width:100%;max-width:250px;margin:14px auto 18px;padding:15px;font-size:17px;background:#ffe36e;color:#241533;box-shadow:0 0 14px #ffe36e55}
+.parts-guide{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin:12px 0;text-align:left}
+.part-guide-item{background:#211632;border:1px solid #70538d;border-radius:5px;padding:7px;font-size:11px;color:#fff}
+.part-guide-item strong{color:#83ff9b}
+.objective{color:#ffe36e!important;font-weight:bold}
+.hidden{display:none!important}
+.game-over-title{color:#ff5e76!important;font-size:clamp(27px,7vw,42px)!important;letter-spacing:3px;animation:pulse 1s infinite alternate}
+@keyframes pulse{from{text-shadow:0 0 5px #ff284e}to{text-shadow:0 0 20px #ff284e}}
+.report{margin:10px 0;padding:10px;background:#211632;border-left:4px solid #ff687e;text-align:left;font-size:12px;line-height:1.5;color:#eee}
+.report strong{color:#ffe36e}
+.report h3{color:#ff8295;font-size:14px;margin:0 0 5px}
+.small-note{font-size:10px!important;color:#bdaed0!important}
+.controls{max-width:230px;margin:15px auto;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.controls button{font-size:20px;padding:12px;background:#60417f;color:white;border:1px solid #a78bc5}
+.controls .empty{visibility:hidden}
+.footer{color:#bba9d0;font-size:10px;margin:15px 0 5px;letter-spacing:1px}
+.copyright{color:#cbb8ed;font-size:12px;margin:10px 0 18px;letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<h1>WORKSHOP SNAKE</h1>
+<div class="subtitle">A LITTLE FORKLIFT. A LOT OF SPARE PARTS.</div>
+
+<div class="game-wrap">
+    <div class="stats">
+        <div class="stat">SCORE<span id="score">0</span></div>
+        <div class="stat">PARTS<span id="parts">0 / 20</span></div>
+        <div class="stat">BEST<span id="best">0</span></div>
+        <div class="stat">TIME<span id="timer">--</span></div>
+
+        <div class="collection-notice hidden" id="collectionNotice">
+            <div class="collection-name" id="collectionName"></div>
+            <div class="collection-points" id="collectionPoints"></div>
+            <div class="collection-label">WORKSHOP REWARDS</div>
+        </div>
+    </div>
+
+    <div class="sound-row">
+        <button class="sound-button" id="soundButton">🔊 SOUND ON</button>
+        <button class="pause-button" id="pauseButton" disabled>⏸ PAUSE</button>
+    </div>
+
+    <canvas id="game" width="600" height="450"></canvas>
+
+    <div class="overlay" id="startOverlay">
+        <div class="panel">
+            <h2>WORKSHOP SNAKE</h2>
+            <p>Collect spare parts. Build your collection. Keep your forklift out of trouble.</p>
+            <button class="start-button" id="startButton">▶ START GAME</button>
+
+            <div class="parts-guide">
+                <div class="part-guide-item">🛞 <strong>Tyre</strong> — 10 pts</div>
+                <div class="part-guide-item">🔋 <strong>Battery</strong> — 10 pts</div>
+                <div class="part-guide-item">🌬️ <strong>Air filter</strong> — 10 pts</div>
+                <div class="part-guide-item">⚙️ <strong>Gearbox</strong> — 20 pts</div>
+                <div class="part-guide-item">🔌 <strong>Alternator</strong> — 15 pts</div>
+                <div class="part-guide-item">🔩 <strong>Brake disc</strong> — 15 pts</div>
+                <div class="part-guide-item">♨️ <strong>Radiator</strong> — 15 pts</div>
+                <div class="part-guide-item">🛢️ <strong>Oil filter</strong> — 10 pts</div>
+            </div>
+
+            <p class="objective">COLLECT 20 PARTS TO UNLOCK THE BONUS ROUND!</p>
+            <p>Eight workshop hazards are present from the start: two workshop personnel and six different physical hazards. After collecting your 14th part, a ninth hazard enters the workshop!</p>
+            <p>The bonus round lasts 60 seconds. Collect as many extra parts as possible while the workshop goes into frenzy mode!</p>
+            <p>Avoid workshop staff, forklifts, oil spills, compressed-air hoses, shelving units, loose tyres, engine components, pallet jacks and your own trail.</p>
+            <p class="small-note">Keyboard: Arrow keys or WASD<br>Phone: Use the directional controls below</p>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="pauseOverlay">
+        <div class="panel">
+            <h2>GAME PAUSED</h2>
+            <p>Your workshop shift is on hold.</p>
+            <p>Take a breather.</p>
+            <button class="start-button" id="resumeButton">▶ RESUME GAME</button>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="endOverlay">
+        <div class="panel">
+            <h2 class="game-over-title">GAME OVER</h2>
+            <p id="endMessage">Your shift has ended.</p>
+            <p id="finalScore"></p>
+            <div class="report" id="incidentReport"></div>
+            <p class="small-note">Training simulation only. Incident reports are illustrative safety guidance, not a substitute for site procedures or a formal investigation.</p>
+            <button id="playAgainButton">PLAY AGAIN</button>
+        </div>
+    </div>
+</div>
+
+<div class="controls">
+    <button class="empty"> </button>
+    <button data-dir="up">▲</button>
+    <button class="empty"> </button>
+    <button data-dir="left">◀</button>
+    <button data-dir="down">▼</button>
+    <button data-dir="right">▶</button>
+</div>
+
+<div class="footer">COLLECT PARTS • BUILD YOUR COLLECTION • AVOID COLLISIONS</div>
+<div class="copyright">©️ Cindy Swigelaar 🤘</div>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+const scoreEl=document.getElementById("score");
+const partsEl=document.getElementById("parts");
+const bestEl=document.getElementById("best");
+const timerEl=document.getElementById("timer");
+
+const startOverlay=document.getElementById("startOverlay");
+const pauseOverlay=document.getElementById("pauseOverlay");
+const endOverlay=document.getElementById("endOverlay");
+
+const soundButton=document.getElementById("soundButton");
+const pauseButton=document.getElementById("pauseButton");
+const resumeButton=document.getElementById("resumeButton");
+
+const collectionNotice=document.getElementById("collectionNotice");
+const collectionName=document.getElementById("collectionName");
+const collectionPoints=document.getElementById("collectionPoints");
+
+const COLS=24,ROWS=18,CELL=25;
+const MIN_X=1,MAX_X=COLS-2,MIN_Y=1,MAX_Y=ROWS-2;
+
+let snake=[],direction="right",nextDirection="right";
+let foods=[],hazards=[];
+let score=0,partsCollected=0;
+let best=Number(localStorage.getItem("workshopSnakeBest")||0);
+
+let gameStage="ready",pausedStage=null,gameTimer=null;
+let stepDelay=500,bonusSeconds=60,bonusInterval=null;
+let ninthHazardAdded=false,collectionTimeout=null;
+
+const BONUS_FOOD_COUNT=6;
+const BONUS_START_SPEED=280;
+const BONUS_MIN_SPEED=160;
+
+bestEl.textContent=best;
+
+/* =================================
+   SOUND SYSTEM
+   No continuous engine sound.
+================================= */
+
+let soundEnabled=true;
+let audioContext=null;
+let audioUnlocked=false;
+let introPlayed=false;
+
+let frenzyInterval=null;
+let frenzyBeat=0;
+
+function getAudio(){
+    if(!soundEnabled)return null;
+
+    try{
+        if(!audioContext){
+            const AudioClass=window.AudioContext||window.webkitAudioContext;
+            if(!AudioClass)return null;
+            audioContext=new AudioClass();
+        }
+
+        if(audioContext.state==="suspended"){
+            audioContext.resume().catch(()=>{});
+        }
+
+        return audioContext;
+    }catch(e){
+        return null;
+    }
+}
+
+function unlockAudio(){
+    if(!soundEnabled)return false;
+
+    const audio=getAudio();
+    if(!audio)return false;
+
+    try{
+        if(audio.state==="suspended")audio.resume();
+        audioUnlocked=true;
+        return true;
+    }catch(e){
+        return false;
+    }
+}
+
+function tone(frequency,duration,type="square",volume=.08,delay=0){
+    if(!soundEnabled||!audioUnlocked)return;
+
+    const audio=getAudio();
+    if(!audio||audio.state!=="running")return;
+
+    try{
+        const oscillator=audio.createOscillator();
+        const gain=audio.createGain();
+
+        oscillator.type=type;
+        oscillator.frequency.setValueAtTime(
+            frequency,audio.currentTime+delay
+        );
+
+        gain.gain.setValueAtTime(.001,audio.currentTime+delay);
+        gain.gain.exponentialRampToValueAtTime(
+            volume,audio.currentTime+delay+.015
+        );
+        gain.gain.exponentialRampToValueAtTime(
+            .001,audio.currentTime+delay+duration
+        );
+
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+
+        oscillator.start(audio.currentTime+delay);
+        oscillator.stop(audio.currentTime+delay+duration+.03);
+    }catch(e){}
+}
+
+/* BONUS-ONLY FRENZY AUDIO */
+
+function startBonusFrenzy(){
+    stopBonusFrenzy();
+
+    if(!soundEnabled||!audioUnlocked||gameStage!=="bonus")return;
+
+    const audio=getAudio();
+    if(!audio||audio.state!=="running")return;
+
+    frenzyBeat=0;
+
+    frenzyInterval=setInterval(()=>{
+        if(gameStage!=="bonus"||!soundEnabled){
+            stopBonusFrenzy();
+            return;
+        }
+
+        const notes=[880,1175,988,1397,1175,1568];
+        const frequency=notes[frenzyBeat%notes.length];
+
+        tone(frequency,.16,"square",.045,0);
+        tone(frequency*1.25,.12,"triangle",.025,.12);
+
+        frenzyBeat++;
+    },320);
+}
+
+function stopBonusFrenzy(){
+    clearInterval(frenzyInterval);
+    frenzyInterval=null;
+}
+
+function arcadeMelody(){
+    if(!soundEnabled||!audioUnlocked)return;
+
+    const notes=[
+        [523,.18],[659,.18],[784,.18],[1046,.30],
+        [784,.18],[880,.18],[1046,.38],
+        [784,.18],[659,.18],[523,.42]
+    ];
+
+    let time=0;
+
+    notes.forEach(note=>{
+        tone(note[0],note[1],"square",.055,time);
+        time+=note[1]+.045;
+    });
+}
+
+function collectSound(valuable=false){
+    if(!soundEnabled||!audioUnlocked)return;
+
+    if(valuable){
+        tone(660,.12,"square",.07,0);
+        tone(880,.12,"square",.07,.12);
+        tone(1100,.16,"square",.07,.24);
+        tone(1320,.22,"triangle",.08,.38);
+    }else{
+        tone(740,.09,"square",.06,0);
+        tone(980,.12,"square",.07,.10);
+        tone(1175,.16,"triangle",.07,.22);
+    }
+}
+
+function collisionSound(type){
+    if(!soundEnabled||!audioUnlocked)return;
+
+    if(type==="oil"){
+        tone(110,.30,"sawtooth",.12,0);
+        tone(75,.35,"sine",.10,.10);
+    }else if(type==="shelving"||type==="engine"){
+        tone(90,.22,"triangle",.12,0);
+        tone(60,.25,"sine",.10,.12);
+    }else if(type==="tyre"||type==="pallet"||type==="forklift"){
+        tone(170,.22,"sawtooth",.12,0);
+        tone(95,.28,"triangle",.10,.12);
+    }else if(type==="hose"){
+        tone(190,.18,"sawtooth",.10,0);
+        tone(100,.28,"triangle",.10,.10);
+    }else{
+        tone(130,.20,"square",.10,0);
+        tone(80,.30,"sawtooth",.09,.12);
+    }
+}
+
+function bonusSound(){
+    if(!soundEnabled||!audioUnlocked)return;
+
+    tone(523,.12,"square",.06,0);
+    tone(659,.12,"square",.06,.13);
+    tone(784,.12,"square",.06,.26);
+    tone(1046,.18,"triangle",.07,.39);
+    tone(1397,.22,"square",.06,.58);
+}
+
+function updateSoundButton(){
+    soundButton.textContent=soundEnabled?"🔊 SOUND ON":"🔇 SOUND OFF";
+}
+
+soundButton.addEventListener("click",()=>{
+    soundEnabled=!soundEnabled;
+    updateSoundButton();
+
+    if(!soundEnabled){
+        stopBonusFrenzy();
+    }else{
+        unlockAudio();
+
+        if(gameStage==="ready")arcadeMelody();
+        if(gameStage==="bonus")startBonusFrenzy();
+    }
+});
+
+/* PART TYPES */
+
+const partTypes=[
+    {name:"Heavy-duty tyre",icon:"🛞",points:10},
+    {name:"Battery",icon:"🔋",points:10},
+    {name:"Air filter",icon:"🌬️",points:10},
+    {name:"Gearbox",icon:"⚙️",points:20},
+    {name:"Alternator",icon:"🔌",points:15},
+    {name:"Brake disc",icon:"🔩",points:15},
+    {name:"Radiator",icon:"♨️",points:15},
+    {name:"Oil filter",icon:"🛢️",points:10}
+];
+
+/* COLLECTION NOTICE */
+
+function showCollectionNotice(food){
+    clearTimeout(collectionTimeout);
+
+    collectionName.textContent=food.icon+" "+food.name.toUpperCase()+" COLLECTED!";
+    collectionPoints.textContent="+"+food.points+" POINTS";
+
+    collectionNotice.classList.remove("hidden","show");
+    void collectionNotice.offsetWidth;
+    collectionNotice.classList.add("show");
+
+    collectionTimeout=setTimeout(()=>{
+        collectionNotice.classList.remove("show");
+        collectionNotice.classList.add("hidden");
+    },1700);
+}
+
+/* SPAWNING */
+
+function isInsidePlayArea(x,y){
+    return Number.isInteger(x)&&Number.isInteger(y)&&
+        x>=MIN_X&&x<=MAX_X&&y>=MIN_Y&&y<=MAX_Y;
+}
+
+function isSpawnCorner(x,y){
+    return (x===MIN_X&&y===MIN_Y)||
+           (x===MAX_X&&y===MIN_Y)||
+           (x===MIN_X&&y===MAX_Y)||
+           (x===MAX_X&&y===MAX_Y);
+}
+
+function isOccupied(x,y){
+    if(!isInsidePlayArea(x,y)||isSpawnCorner(x,y))return true;
+    if(snake.some(s=>s.x===x&&s.y===y))return true;
+    if(hazards.some(h=>h.x===x&&h.y===y))return true;
+    if(foods.some(f=>f.x===x&&f.y===y))return true;
+    return false;
+}
+
+function manhattan(a,b){
+    return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+}
+
+function findFreePosition(minDistance=0){
+    for(let attempt=0;attempt<2000;attempt++){
+        const x=MIN_X+Math.floor(Math.random()*(MAX_X-MIN_X+1));
+        const y=MIN_Y+Math.floor(Math.random()*(MAX_Y-MIN_Y+1));
+
+        if(isOccupied(x,y))continue;
+
+        const candidate={x,y};
+
+        if(minDistance>0){
+            if(snake.some(s=>manhattan(candidate,s)<minDistance))continue;
+            if(hazards.some(h=>manhattan(candidate,h)<minDistance))continue;
+            if(foods.some(f=>manhattan(candidate,f)<minDistance))continue;
+        }
+
+        return candidate;
+    }
+
+    for(let y=MIN_Y;y<=MAX_Y;y++){
+        for(let x=MIN_X;x<=MAX_X;x++){
+            if(!isOccupied(x,y))return {x,y};
+        }
+    }
+
+    return null;
+}
+
+/* NINTH HAZARD AT PART 14 */
+
+function addNinthHazard(){
+    if(ninthHazardAdded)return;
+
+    const position=findFreePosition(4);
+
+    if(position){
+        hazards.push({
+            x:position.x,
+            y:position.y,
+            type:"pallet",
+            icon:"🛒"
+        });
+
+        ninthHazardAdded=true;
+        draw();
+    }
+}
+
+/* FOOD */
+
+function addFood(minDistance=0){
+    const position=findFreePosition(minDistance);
+    if(!position)return false;
+
+    const selected=partTypes[Math.floor(Math.random()*partTypes.length)];
+
+    foods.push({
+        x:position.x,
+        y:position.y,
+        ...selected
+    });
+
+    return true;
+}
+
+function placeFood(){
+    foods=[];
+    addFood(3);
+}
+
+function replenishBonusFoods(){
+    while(foods.length<BONUS_FOOD_COUNT){
+        if(!addFood(2))break;
+    }
+}
+
+/* PAUSE AND BONUS TIMER */
+
+function updatePauseButton(){
+    pauseButton.textContent=gameStage==="paused"?"▶ RESUME":"⏸ PAUSE";
+    pauseButton.disabled=gameStage==="ready"||gameStage==="finished";
+}
+
+function startBonusClock(){
+    clearInterval(bonusInterval);
+    if(gameStage!=="bonus")return;
+
+    bonusInterval=setInterval(()=>{
+        if(gameStage!=="bonus")return;
+
+        bonusSeconds--;
+        timerEl.textContent=bonusSeconds;
+
+        if(bonusSeconds<=0){
+            clearInterval(bonusInterval);
+            finishGame("bonus-complete");
+        }
+    },1000);
+}
+
+function pauseGame(){
+    if(gameStage!=="playing"&&gameStage!=="bonus")return;
+
+    pausedStage=gameStage;
+
+    clearTimeout(gameTimer);
+    clearInterval(bonusInterval);
+
+    stopBonusFrenzy();
+
+    gameStage="paused";
+    pauseOverlay.classList.remove("hidden");
+
+    updatePauseButton();
+}
+
+function resumeGame(){
+    if(gameStage!=="paused"||!pausedStage)return;
+
+    gameStage=pausedStage;
+    pausedStage=null;
+
+    pauseOverlay.classList.add("hidden");
+
+    updatePauseButton();
+
+    if(gameStage==="bonus"){
+        startBonusFrenzy();
+        startBonusClock();
+    }
+
+    scheduleNextStep();
+}
+
+function togglePause(){
+    if(gameStage==="paused"){
+        resumeGame();
+    }else{
+        pauseGame();
+    }
+}
+
+pauseButton.addEventListener("click",togglePause);
+resumeButton.addEventListener("click",resumeGame);
+
+/* RESET */
+
+function resetGame(){
+    clearTimeout(gameTimer);
+    clearInterval(bonusInterval);
+    clearTimeout(collectionTimeout);
+
+    stopBonusFrenzy();
+
+    collectionNotice.classList.remove("show");
+    collectionNotice.classList.add("hidden");
+
+    score=0;
+    partsCollected=0;
+    bonusSeconds=60;
+    direction="right";
+    nextDirection="right";
+    stepDelay=500;
+    ninthHazardAdded=false;
+    pausedStage=null;
+    foods=[];
+
+    snake=[
+        {x:6,y:9},
+        {x:5,y:9},
+        {x:4,y:9}
+    ];
+
+    hazards=[
+        {x:13,y:4,type:"technician",icon:"👨‍🔧"},
+        {x:19,y:12,type:"assistant",icon:"🧑‍🏭"},
+        {x:16,y:7,type:"forklift",icon:"🚜"},
+        {x:9,y:13,type:"shelving",icon:"🗄️"},
+        {x:11,y:5,type:"tyre",icon:"🛞"},
+        {x:20,y:4,type:"engine",icon:"⚙️"},
+        {x:5,y:3,type:"oil",icon:"🛢️"},
+        {x:14,y:13,type:"hose",icon:"〰️"}
+    ];
+
+    gameStage="ready";
+    placeFood();
+
+    scoreEl.textContent=score;
+    partsEl.textContent="0 / 20";
+    timerEl.textContent="--";
+
+    startOverlay.classList.remove("hidden");
+    pauseOverlay.classList.add("hidden");
+    endOverlay.classList.add("hidden");
+
+    updatePauseButton();
+    draw();
+}
+
+/* DRAWING */
+
+function drawGrid(){
+    ctx.fillStyle="#171021";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.strokeStyle="#30203e";
+    ctx.lineWidth=1;
+
+    for(let x=0;x<=canvas.width;x+=CELL){
+        ctx.beginPath();
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,canvas.height);
+        ctx.stroke();
+    }
+
+    for(let y=0;y<=canvas.height;y+=CELL){
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(canvas.width,y);
+        ctx.stroke();
+    }
+}
+
+function drawStockBoundary(){
+    for(let x=0;x<COLS;x++){
+        drawCrate(x,0);
+        drawCrate(x,ROWS-1);
+    }
+
+    for(let y=1;y<ROWS-1;y++){
+        drawCrate(0,y);
+        drawCrate(COLS-1,y);
+    }
+}
+
+function drawCrate(x,y){
+    const px=x*CELL,py=y*CELL;
+
+    ctx.fillStyle="#604126";
+    ctx.fillRect(px+2,py+2,CELL-4,CELL-4);
+
+    ctx.strokeStyle="#b17a43";
+    ctx.lineWidth=2;
+    ctx.strokeRect(px+4,py+4,CELL-8,CELL-8);
+
+    ctx.beginPath();
+    ctx.moveTo(px+6,py+6);
+    ctx.lineTo(px+CELL-6,py+CELL-6);
+    ctx.moveTo(px+CELL-6,py+6);
+    ctx.lineTo(px+6,py+CELL-6);
+    ctx.stroke();
+}
+
+function drawHazards(){
+    hazards.forEach(h=>{
+        const px=h.x*CELL,py=h.y*CELL;
+
+        if(h.type==="oil"){
+            ctx.fillStyle="#8b6a25";
+            ctx.beginPath();
+            ctx.ellipse(px+CELL/2,py+CELL/2,11,8,.3,0,Math.PI*2);
+            ctx.fill();
+
+            ctx.fillStyle="#d6ad3f";
+            ctx.font="15px Arial";
+            ctx.textAlign="center";
+            ctx.textBaseline="middle";
+            ctx.fillText("☣",px+12,py+13);
+
+        }else if(h.type==="shelving"){
+            ctx.fillStyle="#a6a6b5";
+            ctx.fillRect(px+3,py+3,19,19);
+
+            ctx.fillStyle="#604b70";
+            ctx.fillRect(px+5,py+6,15,3);
+            ctx.fillRect(px+5,py+12,15,3);
+            ctx.fillRect(px+5,py+18,15,2);
+
+            ctx.fillStyle="#d9c9ed";
+            ctx.fillRect(px+4,py+3,3,19);
+            ctx.fillRect(px+19,py+3,3,19);
+
+        }else if(h.type==="hose"){
+            ctx.strokeStyle="#d8a84b";
+            ctx.lineWidth=4;
+            ctx.lineCap="round";
+
+            ctx.beginPath();
+            ctx.moveTo(px+3,py+17);
+            ctx.bezierCurveTo(px+7,py+2,px+17,py+23,px+22,py+7);
+            ctx.stroke();
+
+            ctx.fillStyle="#f5d17b";
+            ctx.beginPath();
+            ctx.arc(px+3,py+17,2,0,Math.PI*2);
+            ctx.fill();
+
+        }else{
+            ctx.font="19px Arial";
+            ctx.textAlign="center";
+            ctx.textBaseline="middle";
+            ctx.fillText(h.icon,px+12,py+13);
+        }
+    });
+}
+
+function drawFood(){
+    foods.forEach(food=>{
+        const px=food.x*CELL,py=food.y*CELL;
+
+        ctx.fillStyle="#1b8d45";
+        ctx.fillRect(px+2,py+2,CELL-4,CELL-4);
+
+        ctx.strokeStyle="#82ff9a";
+        ctx.lineWidth=2;
+        ctx.strokeRect(px+3,py+3,CELL-6,CELL-6);
+
+        ctx.font="17px Arial";
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.fillText(food.icon,px+12,py+13);
+    });
+}
+
+function drawForkliftHead(segment){
+    const px=segment.x*CELL,py=segment.y*CELL;
+
+    ctx.save();
+    ctx.translate(px+CELL/2,py+CELL/2);
+
+    let angle=0;
+    if(direction==="up")angle=-Math.PI/2;
+    if(direction==="down")angle=Math.PI/2;
+    if(direction==="left")angle=Math.PI;
+    if(direction==="right")angle=0;
+
+    ctx.rotate(angle);
+
+    ctx.fillStyle="#f4c542";
+    ctx.fillRect(-8,-8,15,16);
+
+    ctx.fillStyle="#38244f";
+    ctx.fillRect(-5,-6,8,12);
+
+    ctx.strokeStyle="#ffe98a";
+    ctx.lineWidth=1.5;
+    ctx.strokeRect(-5,-6,8,12);
+
+    ctx.fillStyle="#171021";
+    ctx.fillRect(-8,-10,5,3);
+    ctx.fillRect(4,-10,5,3);
+    ctx.fillRect(-8,7,5,3);
+    ctx.fillRect(4,7,5,3);
+
+    ctx.fillStyle="#d7d7d7";
+    ctx.fillRect(7,-9,3,18);
+    ctx.fillRect(9,-8,7,2);
+    ctx.fillRect(9,6,7,2);
+
+    ctx.restore();
+}
+
+function drawSnake(){
+    if(!snake.length)return;
+
+    snake.slice(1).forEach(segment=>{
+        const px=segment.x*CELL,py=segment.y*CELL;
+
+        ctx.fillStyle="#e6bd3f";
+        ctx.fillRect(px+8,py+8,CELL-16,CELL-16);
+
+        ctx.fillStyle="#fff0a0";
+        ctx.fillRect(px+10,py+10,CELL-20,CELL-20);
+    });
+
+    drawForkliftHead(snake[0]);
+}
+
+function draw(){
+    drawGrid();
+    drawStockBoundary();
+    drawHazards();
+    drawFood();
+    drawSnake();
+}
+
+/* CONTROLS */
+
+function setDirection(newDirection){
+    const opposites={
+        up:"down",
+        down:"up",
+        left:"right",
+        right:"left"
+    };
+
+    if(opposites[newDirection]===direction)return;
+    nextDirection=newDirection;
+}
+
+document.addEventListener("keydown",event=>{
+    const keys={
+        ArrowUp:"up",w:"up",W:"up",
+        ArrowDown:"down",s:"down",S:"down",
+        ArrowLeft:"left",a:"left",A:"left",
+        ArrowRight:"right",d:"right",D:"right"
+    };
+
+    const newDirection=keys[event.key];
+
+    if(newDirection){
+        event.preventDefault();
+        setDirection(newDirection);
+    }
+
+    if(event.key==="Escape"||event.key===" "){
+        if(gameStage==="playing"||gameStage==="bonus"||gameStage==="paused"){
+            event.preventDefault();
+            togglePause();
+        }
+    }
+});
+
+document.querySelectorAll("[data-dir]").forEach(button=>{
+    button.addEventListener("click",()=>{
+        setDirection(button.dataset.dir);
+    });
+});
+
+/* GAME MOVEMENT */
+
+function startGame(){
+    if(gameStage!=="ready")return;
+
+    unlockAudio();
+
+    if(soundEnabled&&!introPlayed){
+        introPlayed=true;
+        arcadeMelody();
+    }
+
+    gameStage="playing";
+    startOverlay.classList.add("hidden");
+
+    updatePauseButton();
+    scheduleNextStep();
+}
+
+function scheduleNextStep(){
+    clearTimeout(gameTimer);
+
+    if(gameStage!=="playing"&&gameStage!=="bonus")return;
+
+    gameTimer=setTimeout(moveSnake,stepDelay);
+}
+
+function moveSnake(){
+    if(gameStage!=="playing"&&gameStage!=="bonus")return;
+
+    direction=nextDirection;
+
+    const head={...snake[0]};
+
+    if(direction==="up")head.y--;
+    if(direction==="down")head.y++;
+    if(direction==="left")head.x--;
+    if(direction==="right")head.x++;
+
+    if(!isInsidePlayArea(head.x,head.y)){
+        finishGame("stock");
+        return;
+    }
+
+    const hitHazard=hazards.find(h=>h.x===head.x&&h.y===head.y);
+
+    if(hitHazard){
+        finishGame(hitHazard.type);
+        return;
+    }
+
+    if(snake.some(segment=>segment.x===head.x&&segment.y===head.y)){
+        finishGame("self");
+        return;
+    }
+
+    snake.unshift(head);
+
+    const collectedIndex=foods.findIndex(food=>head.x===food.x&&head.y===food.y);
+
+    if(collectedIndex!==-1){
+        const collectedFood=foods[collectedIndex];
+
+        showCollectionNotice(collectedFood);
+
+        score+=collectedFood.points;
+        partsCollected++;
+
+        collectSound(collectedFood.points>=20);
+
+        scoreEl.textContent=score;
+
+        partsEl.textContent=gameStage==="bonus"
+            ?partsCollected+" collected"
+            :partsCollected+" / 20";
+
+        if(score>best){
+            best=score;
+            bestEl.textContent=best;
+            localStorage.setItem("workshopSnakeBest",best);
+        }
+
+        if(gameStage==="playing"){
+            if(partsCollected%5===0&&stepDelay>420){
+                stepDelay-=20;
+            }
+        }else if(gameStage==="bonus"){
+            if((partsCollected-20)%5===0){
+                stepDelay=Math.max(BONUS_MIN_SPEED,stepDelay-15);
+            }
+        }
+
+        if(partsCollected===14)addNinthHazard();
+
+        if(gameStage==="playing"){
+            foods.splice(collectedIndex,1);
+            placeFood();
+
+            if(partsCollected>=20){
+                startBonusRound();
+                return;
+            }
+        }else{
+            foods.splice(collectedIndex,1);
+            replenishBonusFoods();
+        }
+
+    }else{
+        snake.pop();
+    }
+
+    draw();
+    scheduleNextStep();
+}
+
+/* BONUS ROUND */
+
+function startBonusRound(){
+    gameStage="bonus";
+    stepDelay=BONUS_START_SPEED;
+    bonusSeconds=60;
+
+    timerEl.textContent=bonusSeconds;
+    partsEl.textContent=partsCollected+" collected";
+
+    foods=[];
+    replenishBonusFoods();
+
+    bonusSound();
+
+    clearTimeout(gameTimer);
+    clearInterval(bonusInterval);
+
+    draw();
+    updatePauseButton();
+
+    startBonusFrenzy();
+    startBonusClock();
+    scheduleNextStep();
+}
+
+/* INCIDENT REPORTS */
+
+const reports={
+    technician:{
+        title:"WORKSHOP PERSONNEL COLLISION — TECHNICIAN",
+        description:"The forklift has collided with a workshop technician working in the area.",
+        consequences:"Potential injuries, lost-time incidents, legal exposure, operational disruption and damage to workplace safety performance.",
+        immediate:"Stop the equipment. Secure the area, check for injuries, call for assistance and follow the site's emergency response procedure. Report and document the incident.",
+        prevention:"Separate personnel and vehicle routes, use designated walkways, maintain visibility, observe speed limits, use warning signals and follow site traffic rules."
+    },
+    assistant:{
+        title:"WORKSHOP PERSONNEL COLLISION — WORKSHOP ASSISTANT",
+        description:"The forklift has collided with a workshop assistant working in the area.",
+        consequences:"Potential injuries, lost-time incidents, legal exposure, operational disruption and damage to workplace safety performance.",
+        immediate:"Stop the equipment. Secure the area, check for injuries, call for assistance and follow the site's emergency response procedure. Report and document the incident.",
+        prevention:"Separate personnel and vehicle routes, use designated walkways, maintain visibility, observe speed limits, use warning signals and follow site traffic rules."
+    },
+    forklift:{
+        title:"VEHICLE COLLISION — ANOTHER FORKLIFT",
+        description:"The forklift has collided with another forklift operating in the workshop.",
+        consequences:"Potential vehicle damage, load instability, injuries, blocked routes and disruption to workshop operations.",
+        immediate:"Stop both vehicles if safe to do so. Secure the area, check for injuries and unstable loads, isolate damaged equipment and report the incident.",
+        prevention:"Use designated vehicle routes, maintain safe following distances, observe speed limits, use warning signals and coordinate vehicle movements in shared areas."
+    },
+    oil:{
+        title:"SLIP HAZARD — OIL SPILL",
+        description:"The forklift has driven into an oil spill.",
+        consequences:"Loss of traction, vehicle instability, slips and falls, contamination and potential environmental impact.",
+        immediate:"Stop work and isolate the spill area. Prevent further traffic through the affected area and follow the approved spill response procedure using suitable PPE and materials.",
+        prevention:"Inspect floors regularly, repair leaks promptly, store oils correctly, maintain spill kits and ensure spills are reported and cleaned up without delay."
+    },
+    hose:{
+        title:"TRIP AND ENTANGLEMENT HAZARD — COMPRESSED-AIR HOSE",
+        description:"The forklift has driven over or become entangled with a compressed-air hose.",
+        consequences:"Potential hose damage, sudden air release, equipment damage, trip hazards and injury to nearby personnel.",
+        immediate:"Stop the vehicle and isolate the affected area. Depressurise the hose safely if required, inspect it for damage and report any defects before reuse.",
+        prevention:"Use hose reels or designated hose routes, keep hoses away from vehicle paths, inspect connections and store hoses properly when not in use."
+    },
+    shelving:{
+        title:"STORAGE AREA COLLISION — SHELVING UNIT",
+        description:"The forklift has collided with a workshop shelving unit.",
+        consequences:"Potential falling items, damaged shelving, damaged parts, blocked access routes and injury to nearby personnel.",
+        immediate:"Stop the vehicle. Keep people clear of unstable shelving or falling items. Isolate the area and report the damage for inspection before the shelving is used again.",
+        prevention:"Keep aisles clear, secure shelving units, store heavy items on lower shelves, respect storage limits and maintain adequate clearance when manoeuvring."
+    },
+    tyre:{
+        title:"WORKSHOP OBSTRUCTION — LOOSE TYRE",
+        description:"The forklift has collided with a loose tyre left in the workshop area.",
+        consequences:"Potential loss of vehicle control, damaged equipment, displaced materials, blocked access routes and injury to nearby personnel.",
+        immediate:"Stop the vehicle and secure the area. Check for damage or injuries. Remove the obstruction only when it is safe to do so and report the incident.",
+        prevention:"Store tyres in designated racks or storage areas. Keep workshop floors and vehicle routes clear and return loose components to their correct storage locations."
+    },
+    engine:{
+        title:"WORKSHOP OBSTRUCTION — ENGINE COMPONENT",
+        description:"The forklift has collided with an engine component left in the workshop area.",
+        consequences:"Potential damage to valuable components, equipment damage, trip hazards, blocked work areas and injury to nearby personnel.",
+        immediate:"Stop the vehicle and secure the area. Inspect the component and equipment for damage. Keep the area clear and report any damaged parts.",
+        prevention:"Use designated component storage areas, keep parts off vehicle routes, use suitable stands or storage racks and maintain good workshop housekeeping."
+    },
+    pallet:{
+        title:"MATERIAL HANDLING COLLISION — PALLET JACK",
+        description:"The forklift has collided with a pallet jack in the workshop.",
+        consequences:"Potential equipment damage, foot or leg injuries, displaced loads, blocked access routes and disruption to workshop operations.",
+        immediate:"Stop the vehicle and secure the area. Check for injuries and unstable loads. Isolate damaged equipment and report the incident before operations resume.",
+        prevention:"Keep pallet jacks in designated storage areas when not in use. Separate vehicle and material-handling routes, maintain visibility and keep access ways clear."
+    },
+    self:{
+        title:"LOSS OF CONTROL — SELF COLLISION",
+        description:"The forklift has collided with its own path or trail.",
+        consequences:"Potential loss of control, equipment damage, injury risk and disruption to workshop operations.",
+        immediate:"Stop the vehicle and assess the area for damage or injury. Report any incident and check equipment before returning it to service.",
+        prevention:"Maintain awareness of the surrounding area, plan manoeuvres, avoid abrupt direction changes and keep a safe operating path."
+    },
+    stock:{
+        title:"STORAGE AREA COLLISION",
+        description:"The forklift has collided with the workshop storage boundary.",
+        consequences:"Potential damage to storage areas, blocked access routes and injury to nearby personnel.",
+        immediate:"Stop the vehicle. Keep people clear of any damaged or unstable storage area. Isolate the area and report the damage for inspection.",
+        prevention:"Keep aisles clear, respect storage boundaries, stack materials safely, observe load limits and maintain adequate clearance when manoeuvring."
+    },
+    "bonus-complete":{
+        title:"SHIFT COMPLETED",
+        description:"The bonus collection period has ended.",
+        consequences:"No collision recorded during the final collection period.",
+        immediate:"End the task safely and park equipment in the designated area.",
+        prevention:"Continue following workshop traffic rules and safe operating procedures."
+    }
+};
+
+function finishGame(type){
+    if(gameStage==="finished")return;
+
+    gameStage="finished";
+    pausedStage=null;
+
+    clearTimeout(gameTimer);
+    clearInterval(bonusInterval);
+    clearTimeout(collectionTimeout);
+
+    stopBonusFrenzy();
+
+    collectionNotice.classList.remove("show");
+    collectionNotice.classList.add("hidden");
+
+    pauseOverlay.classList.add("hidden");
+    updatePauseButton();
+
+    if(type!=="bonus-complete")collisionSound(type);
+
+    if(soundEnabled&&audioUnlocked){
+        setTimeout(()=>arcadeMelody(),type==="bonus-complete"?100:300);
+    }
+
+    const report=reports[type]||reports.stock;
+
+    document.getElementById("endMessage").textContent=report.description;
+    document.getElementById("finalScore").textContent="FINAL SCORE: "+score+" POINTS";
+
+    document.getElementById("incidentReport").innerHTML=`
+        <h3>${report.title}</h3>
+        <strong>Potential consequences:</strong><br>
+        ${report.consequences}<br><br>
+        <strong>Recommended immediate actions:</strong><br>
+        ${report.immediate}<br><br>
+        <strong>Preventive measures:</strong><br>
+        ${report.prevention}
+    `;
+
+    endOverlay.classList.remove("hidden");
+}
+
+/* BUTTONS */
+
+document.getElementById("startButton").addEventListener("click",startGame);
+document.getElementById("playAgainButton").addEventListener("click",resetGame);
+
+/* INITIALISE */
+
+updateSoundButton();
+resetGame();
+</script>
+</body>
+</html>

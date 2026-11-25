@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heavy Vehicle Games | Interactive Industry Games</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #101820;
+    color: #f1f3f5;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    padding: 65px 20px 55px;
+    background: linear-gradient(135deg, #172936, #263b49);
+    border-bottom: 4px solid #f0a500;
+}
+
+header h1 {
+    color: #f0a500;
+    font-size: 38px;
+    margin: 0 0 10px;
+}
+
+header p {
+    color: #d0d8df;
+    max-width: 700px;
+    margin: auto;
+}
+
+.tagline {
+    color: #f0a500;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-top: 18px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 35px 20px;
+}
+
+.section-title {
+    color: #f0a500;
+    border-bottom: 1px solid #43515d;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+}
+
+.games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 24px;
+}
+
+.game-card {
+    background: #1c2933;
+    border: 1px solid #394955;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-card img {
+    width: 100%;
+    height: 195px;
+    object-fit: cover;
+    background: #263b49;
+}
+
+.game-content {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.game-content h3 {
+    color: #f0a500;
+    margin: 0 0 10px;
+    font-size: 21px;
+}
+
+.game-content p {
+    color: #c7d0d8;
+    font-size: 14px;
+}
+
+.play-button {
+    display: block;
+    margin-top: auto;
+    padding: 13px;
+    background: #f0a500;
+    color: #101820;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+.play-button:hover {
+    background: #ffc233;
+}
+
+.about {
+    background: #1c2933;
+    border-left: 4px solid #f0a500;
+    padding: 24px;
+    border-radius: 6px;
+    margin-top: 45px;
+}
+
+.about h2 {
+    color: #f0a500;
+    margin-top: 0;
+}
+
+.about ul {
+    padding-left: 22px;
+}
+
+footer {
+    text-align: center;
+    padding: 28px 15px;
+    background: #0b1218;
+    color: #9eabb5;
+    font-size: 13px;
+    border-top: 1px solid #394955;
+}
+
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 29px;
+    }
+
+    header {
+        padding: 45px 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>HEAVY VEHICLE GAMES</h1>
+    <p>Interactive Games & Industry-Specific Learning Experiences</p>
+    <div class="tagline">INDUSTRY KNOWLEDGE. CREATIVE THINKING. INTERACTIVE PLAY.</div>
+</header>
+
+<main class="container">
+
+    <h2 class="section-title">Explore the Games</h2>
+
+    <div class="games">
+
+        <article class="game-card">
+            <img src="recovery%20run%20menu.jpg" alt="GP Truck Aid Recovery Run game menu">
+            <div class="game-content">
+                <h3>GP Truck Aid – Recovery Run</h3>
+                <p>
+                    Take on a heavy-vehicle recovery challenge.
+                    Navigate road hazards, tow a disabled commercial
+                    vehicle and deliver it safely to the workshop.
+                </p>
+                <a class="play-button"
+                   href="GP_Truck_Aid_Recovery_Run%20(3)%20(1).html">
+                    ▶ PLAY RECOVERY RUN
+                </a>
+            </div>
+        </article>
+
+        <article class="game-card">
+            <img src="workshop%20forklift%20gameplay%201.jpg" alt="Workshop Snake game">
+            <div class="game-content">
+                <h3>Workshop Snake</h3>
+                <p>
+                    A workshop-themed take on the classic Snake game,
+                    bringing industrial visuals and safety messages
+                    into an arcade-style experience.
+                </p>
+                <a class="play-button" href="Workshop_Snake.html">
+                    ▶ PLAY WORKSHOP SNAKE
+                </a>
+            </div>
+        </article>
+
+        <article class="game-card">
+            <img src="heavy%20metal%20part%20guess%20menu%201.jpg" alt="Heavy Metal Word Challenge game">
+            <div class="game-content">
+                <h3>Heavy Metal Word Challenge</h3>
+                <p>
+                    Test your knowledge of heavy-vehicle parts,
+                    components and systems through an interactive
+                    clue-based word challenge.
+                </p>
+                <a class="play-button" href="Heavy_Metal_Word_Challenge.html">
+                    ▶ PLAY WORD CHALLENGE
+                </a>
+            </div>
+        </article>
+
+    </div>
+
+    <section class="about">
+        <h2>Behind the Games</h2>
+        <p>
+            These projects began with original concepts and creative
+            direction inspired by the heavy-vehicle repair, recovery
+            and workshop industry.
+        </p>
+        <p>
+            My contribution included:
+        </p>
+        <ul>
+            <li>Original game concepts and creative direction.</li>
+            <li>Defining gameplay, features, interactions and visual style.</li>
+            <li>Developing detailed functional requirements and instructions.</li>
+            <li>Applying practical heavy-vehicle industry knowledge.</li>
+            <li>Incorporating safety awareness and learning themes.</li>
+            <li>AI-assisted development, testing and refinement.</li>
+        </ul>
+        <p>
+            AI tools assisted with the coding and implementation.
+            Acode was also used as part of the mobile development
+            and testing workflow.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    Heavy Vehicle Games | Independent AI-Assisted Game Projects
+    <br>
+    Educational and entertainment experiences – not certified
+    driving simulators or formal workplace training.
+</footer>
+
+</body>
+</html>

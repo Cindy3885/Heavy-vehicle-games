@@ -120,7 +120,7 @@ My contribution included:
 - **Industry knowledge:** Applying practical familiarity with heavy-vehicle repair, recovery operations, workshop environments and parts identification.
 - **Learning and safety design:** Incorporating industry-related terminology, hazards, safety awareness and educational elements into the game concepts.
 - **AI instruction and collaboration:** Preparing detailed prompts and specifications to guide AI-assisted development.
-- **Testing and refinement:** Playing the games, reviewing the results and identifying areas requiring improvement.
+- **Testing and refinement:** Playing the games, reviewing the results and identifying areas requiring bugs or improvement.
 
 AI tools assisted with translating the concepts and specifications into browser-based game implementations. The creative concepts, requirements and direction were human-led.
 

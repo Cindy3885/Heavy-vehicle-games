@@ -98,6 +98,8 @@ The concept connects word-game mechanics with industry-specific learning and par
 
 **Game screenshots**
 
+![Heavy Metal Word Challenge Menu](<heavy metal part guess menu 2.jpg>)
+
 ![Heavy Metal Word Challenge Menu](<heavy metal part guess menu 1.jpg>)
 
 ![Heavy Metal Word Challenge Gameplay](<heavy metal part guess gameplay.jpg>)

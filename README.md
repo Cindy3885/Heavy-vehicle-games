@@ -1,106 +1,61 @@
 # HEAVY VEHICLE GAMES
 ### Interactive Games & Industry-Specific Learning Experiences
 
-**Turning Industry Knowledge Into Interactive Digital Experiences.**
+A collection of interactive games exploring how industry knowledge, creative thinking and AI-assisted development can be transformed into engaging digital experiences.
 
-[🌐 VISIT THE LIVE GAME WEBSITE](https://cindy3885.github.io/Heavy-vehicle-games/)
+These projects demonstrate how games can be designed around a company's industry, products, services, brand identity and audience — creating opportunities for customer engagement, marketing, education and employee interaction.
 
-An independent collection of original, AI-assisted browser game projects inspired by the heavy-vehicle repair, recovery, workshop and commercial vehicle parts industry.
-
-This project explores the intersection of industry knowledge, creative thinking, game concepts, digital problem-solving and AI-assisted development.
-
-Rather than developing conventional arcade games, the objective was to take familiar game formats and original gameplay ideas and give them an industry-specific identity.
-
-The result is a collection of interactive experiences combining entertainment, practical industry themes, visual storytelling and learning opportunities.
+**[Visit the Live Games Website](https://cindy3885.github.io/Heavy-vehicle-games/)**
 
 ---
 
-# 🎮 EXPLORE THE GAMES
+# THE GAMES
 
-All three games are published and accessible through the live website. Each game can also be opened individually using the links below.
+## 1. GP Truck Aid – Recovery Run
 
-## 01. GP Truck Aid – Recovery Run
+An interactive heavy-vehicle recovery game inspired by real-world commercial vehicle recovery operations.
 
-**A Heavy-Vehicle Recovery & Safety Awareness Game**
+The concept takes players through a recovery scenario where awareness, positioning, navigation and safe vehicle handling are important.
 
-[▶ PLAY RECOVERY RUN](https://cindy3885.github.io/Heavy-vehicle-games/GP_Truck_Aid_Recovery_Run%20%283%29%20%281%29.html)
+The game explores how an industry-specific subject can be turned into an interactive experience rather than presented as traditional information or training material.
 
-An original arcade-style game concept built around a commercial heavy-vehicle recovery operation.
+**[PLAY GP TRUCK AID – RECOVERY RUN](https://cindy3885.github.io/Heavy-vehicle-games/GP_Truck_Aid_Recovery_Run%20%283%29%20%281%29.html)**
 
-The player takes control of a recovery truck towing a disabled commercial vehicle. The objective is to navigate a public road, enter a company premises, negotiate a workshop environment and safely deliver the recovered vehicle to its designated loading bay.
-
-The concept combines arcade-style driving with practical road and workplace safety themes.
-
-### Gameplay & Learning Themes
-
-- Heavy-vehicle recovery and towing scenarios.
-- Road hazard identification and awareness.
-- Workshop yard navigation.
-- Pedestrian and forklift safety.
-- Collision prevention and vehicle control.
-- Oil spill hazards and loss of traction.
-- Near-miss awareness and incident reporting.
-- Loading bay manoeuvring and delivery alignment.
-- Safe completion of a recovery operation.
-
-### Game Screenshots
-
-**Game menu**
-
-![Recovery Run Menu](recovery%20run%20menu.jpg)
-
-**Gameplay**
-
-![Recovery Run Gameplay 1](recovery%20run%20gameplay%201.jpg)
-
-![Recovery Run Gameplay 2](recovery%20run%20gameplay%202.jpg)
+### Gameplay Screenshots
 
 ![Recovery Run Gameplay 3](recovery%20run%20gameplay%203.jpg)
 
-**Incident and game-over scenarios**
+![Recovery Run Gameplay 2](recovery%20run%20gameplay%202.jpg)
+
+![Recovery Run Gameplay 1](recovery%20run%20gameplay%201.jpg)
+
+### Game Over Screens
 
 ![Recovery Run Game Over 1](recovery%20run%20game%20over%201.jpg)
 
 ![Recovery Run Game Over 2](recovery%20run%20game%20over%202.jpg)
 
-### Creative & Development Focus
+### Game Menu
 
-This project involved developing the original recovery game concept, defining the recovery operation, specifying vehicle behaviour, designing progressive environments, identifying hazards and incorporating safety-related gameplay scenarios.
-
-The creative direction also covered the arcade presentation, visual environment, gameplay flow, controls, sound requirements, incident feedback and overall player experience.
-
-The objective was to make safety awareness part of the gameplay rather than simply presenting players with a list of safety rules.
+![Recovery Run Menu](recovery%20run%20menu.jpg)
 
 ---
 
-## 02. Workshop Snake
+## 2. Workshop Snake
 
-**A Workshop-Themed Take on a Classic Arcade Game**
+A workshop-themed take on the classic Snake game, using an industrial and heavy-vehicle workshop setting to give a familiar game a different identity.
 
-[▶ PLAY WORKSHOP SNAKE](https://cindy3885.github.io/Heavy-vehicle-games/Workshop_Snake.html)
+This project demonstrates how an existing game concept can be reimagined around a company's environment, industry or brand.
 
-A creative reinterpretation of the classic Snake game, bringing an industrial workshop identity into a familiar arcade format.
+**[PLAY WORKSHOP SNAKE](https://cindy3885.github.io/Heavy-vehicle-games/Workshop_Snake.html)**
 
-The concept takes a recognisable game mechanic and gives it a different visual environment, using workshop-inspired elements and safety-related messaging.
-
-### Gameplay & Creative Themes
-
-- Workshop-inspired arcade environment.
-- Industrial and forklift-themed visual elements.
-- Classic gameplay with a different visual identity.
-- Safety messages integrated into the experience.
-- Player interaction and visual feedback.
-- Game progression and game-over scenarios.
-
-### Game Screenshots
-
-**Gameplay**
+### Gameplay Screenshots
 
 ![Workshop Snake Gameplay 1](workshop%20forklift%20gameplay%201.jpg)
 
 ![Workshop Snake Gameplay 2](workshop%20forklift%20gameplay%202.jpg)
 
-**Game-over screens**
+### Game Over Screens
 
 ![Workshop Snake Game Over 1](workshop%20forklift%20game%20over%201.jpg)
 
@@ -108,189 +63,188 @@ The concept takes a recognisable game mechanic and gives it a different visual e
 
 ### Development & Testing
 
-Acode was used as part of the mobile development workflow for working with and testing the game.
-
 ![Acode Workshop Forklift Testing](Acode%20workshop%20forklift%20testing.jpg)
-
-This project demonstrates the ability to take an established game concept, introduce an original industry-specific creative direction and explore how educational messaging can be incorporated into an entertaining experience.
 
 ---
 
-## 03. Heavy Metal Word Challenge
+## 3. Heavy Metal Word Challenge
 
-**A Heavy-Vehicle Parts & Systems Word Game**
+A heavy-vehicle parts and terminology word game built around industry knowledge.
 
-[▶ PLAY HEAVY METAL WORD CHALLENGE](https://cindy3885.github.io/Heavy-vehicle-games/Heavy_Metal_Word_Challenge.html)
+The concept combines word recognition, clues and partially revealed answers to make learning technical terminology more interactive and enjoyable.
 
-An industry-specific word challenge inspired by heavy-vehicle parts, components, systems and technical terminology.
+Players are challenged to identify heavy-vehicle-related words using the available clues and revealed letters.
 
-The concept transforms parts identification and technical vocabulary into an interactive guessing experience.
+This demonstrates how technical or industry-specific knowledge can be incorporated into a simple game format, making information more accessible and engaging.
 
-Players are presented with clues and partially revealed words. They must identify the correct component or technical term to progress through the challenge.
-
-The wider creative concept also explores progressive visual rewards, with correctly identified answers contributing to the assembly of a complete heavy-vehicle illustration.
-
-### Gameplay & Learning Themes
-
-- Heavy-vehicle component identification.
-- Parts and systems terminology.
-- Technical vocabulary recognition.
-- Clue-based problem-solving.
-- Knowledge recall and learning through gameplay.
-- Progressive challenges and visual rewards.
+**[PLAY HEAVY METAL WORD CHALLENGE](https://cindy3885.github.io/Heavy-vehicle-games/Heavy_Metal_Word_Challenge.html)**
 
 ### Game Screenshots
 
-**Game menu**
+![Heavy Metal Word Challenge Menu 2](heavy%20metal%20part%20guess%20menu%202.jpg)
 
-![Heavy Metal Word Challenge Menu](heavy%20metal%20part%20guess%20menu%201.jpg)
-
-**Gameplay**
+![Heavy Metal Word Challenge Menu 1](heavy%20metal%20part%20guess%20menu%201.jpg)
 
 ![Heavy Metal Word Challenge Gameplay](heavy%20metal%20part%20guess%20gameplay.jpg)
 
-### Creative & Development Focus
+---
 
-The original idea was to use a familiar word-guessing mechanic as a way of exploring technical knowledge in a more engaging format.
+# THE THINKING BEHIND THE GAMES
 
-The concept draws on practical familiarity with heavy-vehicle parts and systems, with an emphasis on making industry terminology accessible through interactive challenges.
+## More Than Just Entertainment
+
+The idea behind these projects goes beyond creating games for people to play.
+
+Interactive, branded games can become an additional feature of a company's existing website and wider digital presence. They offer businesses another way to connect with people, encourage interaction and create experiences that are different from conventional marketing content.
+
+Although the examples in this repository are based on the heavy-vehicle industry, the concept can be adapted to virtually any industry or business.
+
+A game could be developed around a company's products, services, industry, brand identity, customers or employees. It could be made available through an existing website, shared through social media or used internally as an employee engagement activity.
+
+## Business Applications
+
+### 1. Website Engagement & Customer Attraction
+
+A custom game can give visitors another reason to explore a company's website.
+
+Rather than simply reading about products or services, visitors can interact with the brand through an experience designed around the business.
+
+This can help make a website more memorable, encourage repeat visits and provide another opportunity to introduce visitors to the company's offerings.
+
+### 2. Brand Awareness & Social Media Visibility
+
+Games can create shareable content that businesses can promote through their social media pages.
+
+An entertaining or interesting branded game gives followers something to interact with and potentially share with their own networks.
+
+This creates an additional opportunity to increase brand visibility and reach audiences beyond the company's existing followers.
+
+### 3. Customer Engagement & Lead Generation
+
+Interactive games can be used to attract potential customers, encourage enquiries and support lead-generation campaigns.
+
+Depending on the business objective, a game could be connected to a promotional campaign, product launch, competition or service offering.
+
+The game itself becomes an engagement tool, with the potential to introduce new customers to the business while also giving existing customers another reason to interact with the brand.
+
+### 4. Employee Engagement & Workplace Morale
+
+The concept is not limited to external marketing.
+
+Companies could also make games available to employees as a recreational activity during short breaks or quieter periods.
+
+A simple, enjoyable game can provide a change of pace during the working day and offer employees something fun to interact with.
+
+Games could also be designed around the company's workplace, industry or internal culture, making them more relevant and familiar to employees.
+
+### 5. Learning Through Play
+
+Games can incorporate educational elements without making the experience feel like formal training.
+
+Depending on the industry, this could include:
+
+- Product knowledge and product identification.
+- Industry terminology and technical knowledge.
+- Workplace safety awareness.
+- Company procedures and general knowledge.
+- Customer product awareness.
+- Problem-solving and decision-making challenges.
+
+This creates opportunities to combine entertainment with learning in a more interactive format.
+
+### 6. Family-Friendly Engagement
+
+Where appropriate, companies could also create games that employees can share with their children and families.
+
+This extends the experience beyond the workplace and gives employees another way to interact with the company's brand outside working hours.
+
+A family-friendly game could introduce younger audiences to a company's industry, products or services in an accessible and entertaining way.
+
+## An Adaptable Concept for Different Industries
+
+The possibilities are not restricted to heavy vehicles or industrial businesses.
+
+For example:
+
+- **Automotive:** Vehicle identification, road-safety challenges and car-themed games.
+- **Retail:** Product quizzes, shopping challenges and promotional games.
+- **Hospitality:** Destination quizzes, food games and interactive customer experiences.
+- **Construction:** Equipment identification, safety challenges and industry-themed games.
+- **Education:** Subject-based quizzes, vocabulary games and learning activities.
+- **Manufacturing:** Product knowledge, machinery identification and workplace awareness games.
+- **Professional services:** General knowledge challenges, brand-themed quizzes and interactive promotional experiences.
+
+The format, complexity and purpose can be adapted to suit the business and the audience it wants to reach.
+
+The objective is not simply to give a company a game. It is to explore how a custom interactive experience can become a useful addition to its marketing, customer engagement, learning or employee communication activities.
 
 ---
 
-# 💡 CONCEPT CREATION & CREATIVE DIRECTION
+# CONCEPT CREATION & DEVELOPMENT
 
-**The concepts and creative direction originated with me. AI was used as a development collaborator to help bring those ideas to life.**
+These projects originated from original concepts and creative direction, with AI-assisted development used to help translate the ideas into working interactive experiences.
 
-These projects demonstrate an approach to digital development that starts with an idea, identifies the experience it should deliver and translates that vision into detailed instructions and functional requirements.
+The development process involved more than simply asking AI to generate a game. It required defining the purpose, thinking through the player experience, identifying relevant industry elements and refining the intended result.
 
-My contribution extended beyond requesting a game to be generated.
+### My Contribution
 
-It involved thinking through what the player should experience, how the game should look and feel, what should happen during gameplay, how different features should interact and what purpose the experience should serve.
+- Original game concepts and ideas.
+- Creative direction and gameplay requirements.
+- Industry-specific knowledge and context.
+- Defining the purpose and intended audience of each game.
+- Developing and refining instructions for AI-assisted implementation.
+- Reviewing, testing and refining the resulting experiences.
+- Considering how the concepts could be adapted for business applications.
 
-### My Role & Contributions
-
-**1. Original Concept Development**
-
-- Generating original game ideas.
-- Identifying opportunities to connect familiar game formats with the heavy-vehicle industry.
-- Developing the purpose and intended experience of each game.
-- Exploring how entertainment and industry-related learning could work together.
-
-**2. Creative Direction & Experience Design**
-
-- Defining the visual identity and overall atmosphere.
-- Describing game environments, vehicles, equipment and industrial elements.
-- Directing gameplay presentation and player interactions.
-- Specifying the desired look, feel, sounds and feedback.
-- Developing the overall experience rather than relying on generic game templates.
-
-**3. Functional Requirements & Gameplay Planning**
-
-- Defining how the games should work.
-- Describing controls, gameplay mechanics and player objectives.
-- Specifying interactions, game states and feedback.
-- Identifying hazards, events and expected responses.
-- Providing detailed instructions for how individual features should behave.
-
-**4. Industry Knowledge & Practical Application**
-
-- Applying heavy-vehicle repair and recovery knowledge.
-- Incorporating workshop environments and operational scenarios.
-- Using familiarity with commercial vehicle components and systems.
-- Connecting practical industry themes to interactive game concepts.
-
-**5. AI Instruction & Collaboration**
-
-- Preparing detailed prompts and development briefs.
-- Breaking creative concepts into functional requirements.
-- Directing AI tools through iterative development.
-- Reviewing generated implementations against the original requirements.
-- Identifying inconsistencies and areas requiring refinement.
-
-**6. Testing & Quality Review**
-
-- Testing the games in a browser environment.
-- Reviewing gameplay and visual presentation.
-- Checking the player experience and interactions.
-- Reviewing game screens and behaviour.
-- Identifying issues and opportunities for improvement.
+AI was used as a development and coding assistant. The concepts, direction, requirements and intended applications were established through the creative process behind each project.
 
 ---
 
-# 🛠 TOOLS & TECHNOLOGY
+# TECHNOLOGY & TOOLS
 
-The projects demonstrate the use of accessible digital tools and AI-assisted development methods.
+The projects explore the use of accessible web technologies and AI-assisted development.
 
-| Tool / Technology | Application |
+| Technology / Tool | Application |
 |---|---|
-| AI-assisted development | Translating original concepts and specifications into game implementations |
-| Acode | Mobile code editing and development workflow |
-| HTML | Browser-based game structure |
-| CSS | Visual presentation and responsive styling |
-| JavaScript | Gameplay logic and interactive functionality |
-| Canvas | Browser-based game rendering where implemented |
-| GitHub | Source file management and project presentation |
-| GitHub Pages | Publishing and hosting the live games |
-
-**Development approach:** AI-assisted, human-directed concept development and iterative testing.
-
-The coding implementation was AI-assisted. The original ideas, creative direction, industry-specific requirements and project specifications were human-led.
+| HTML | Webpage and game structure |
+| CSS | Layout, styling and visual presentation |
+| JavaScript | Game logic and interactive behaviour |
+| Canvas | Interactive graphics where implemented |
+| AI-assisted development | Supporting coding, development and refinement |
+| Acode | Mobile code editing and testing |
+| GitHub | Source code storage and project management |
+| GitHub Pages | Hosting and publishing the games online |
 
 ---
 
-# 🚀 SKILLS DEMONSTRATED
+# SKILLS & CAPABILITIES DEMONSTRATED
 
-These projects provide practical examples of several complementary skills.
+These projects demonstrate a combination of creative, practical and technical capabilities.
 
-| Skill Area | Demonstrated Capabilities |
-|---|---|
-| Creative thinking | Original ideas, concept development and creative direction |
-| Product thinking | Defining purpose, functionality and intended user experience |
-| Requirements definition | Detailed instructions, feature specifications and gameplay planning |
-| Prompt engineering | Structured prompting, context development and iterative AI instruction |
-| AI collaboration | Directing AI-assisted development and reviewing generated outputs |
-| Industry knowledge | Heavy-vehicle repair, recovery, workshop environments and parts terminology |
-| User experience | Gameplay flow, interactions, feedback and visual presentation |
-| Safety awareness | Hazard scenarios, incident prevention and educational messaging |
-| Problem-solving | Translating practical ideas into interactive digital experiences |
-| Testing & refinement | Reviewing functionality, identifying issues and improving results |
-| Digital development tools | Acode, HTML, CSS, JavaScript and GitHub |
-| Project development | Moving from an original concept to a published interactive experience |
+- Creative thinking and concept development.
+- Identifying opportunities for digital engagement.
+- Translating ideas into practical project requirements.
+- AI collaboration and prompt development.
+- Industry knowledge and contextual application.
+- User experience and gameplay considerations.
+- Problem-solving and iterative refinement.
+- Testing and reviewing interactive experiences.
+- Understanding potential business applications of digital tools.
+- Exploring accessible web-based development.
 
 ---
 
-# 🎯 PROJECT PURPOSE
+# PURPOSE OF THIS REPOSITORY
 
-Heavy Vehicle Games explores how practical industry knowledge can be translated into engaging digital experiences.
+This repository serves as a portfolio of interactive game concepts and AI-assisted development projects.
 
-The collection demonstrates that AI-assisted development can extend beyond conventional website generation and administrative automation. It can also support creative experimentation, interactive learning concepts and industry-specific digital products.
+It demonstrates how original ideas, industry knowledge and creative direction can be used to develop interactive digital experiences with potential applications beyond entertainment.
 
-The broader objective is to explore opportunities for:
+The projects also explore how businesses can use custom games as part of a broader digital strategy — creating opportunities for customer interaction, brand visibility, learning and employee engagement.
 
-- Interactive industry education.
-- Safety awareness and scenario-based learning.
-- Heavy-vehicle parts and systems knowledge.
-- Gamified training concepts.
-- Creative digital product development.
-
-These projects are independent experimental game experiences. They are not certified driving simulators, formal workplace safety programmes or substitutes for professional technical training.
+**The bigger idea: turn a company's industry, products, services or identity into an experience people can interact with, enjoy and share.**
 
 ---
 
-# 👩‍💻 PROJECT CREATOR & DEVELOPMENT
+*These games are independent portfolio projects and concept demonstrations. They are not official products or training tools of any company featured or referenced in the concepts.*
 
-**Original concepts, creative direction, industry-specific requirements and project specifications: Human-led.**
-
-**Development and coding implementation: AI-assisted.**
-
-**Editing, testing, project organisation and publication: Human-directed.**
-
-This portfolio represents an exploration of what can be achieved by combining practical industry knowledge, creative problem-solving and accessible AI-assisted development tools.
-
-The emphasis is not simply on writing code. It is on recognising an idea, understanding the requirements, communicating the intended outcome, directing the development process and turning a concept into something people can actually interact with.
-
----
-
-**HEAVY VEHICLE GAMES**
-
-*Industry Knowledge. Creative Thinking. Interactive Experiences*
